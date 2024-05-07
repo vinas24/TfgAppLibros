@@ -16,7 +16,7 @@ import com.example.tfgapplibros.views.Principal
 import com.example.tfgapplibros.views.RegisterView
 
 class MainActivity : ComponentActivity() {
-    /*comentario lucia*/
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
