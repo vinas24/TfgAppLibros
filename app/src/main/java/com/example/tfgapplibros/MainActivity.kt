@@ -8,7 +8,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.tfgapplibros.ui.theme.TfgAppLibrosTheme
+import com.example.tfgapplibros.views.AddLibro
+import com.example.tfgapplibros.views.LibroView
 import com.example.tfgapplibros.views.LoginView
+import com.example.tfgapplibros.views.Perfil
 import com.example.tfgapplibros.views.Principal
 import com.example.tfgapplibros.views.RegisterView
 
@@ -32,6 +35,16 @@ class MainActivity : ComponentActivity() {
                         composable("principal") {
                             Principal(navController)
                         }
+                        composable("perfil") {
+                            Perfil()
+                        }
+                        composable("libro") {
+                            LibroView()
+                        }
+                        composable("addlibro") {
+                            AddLibro()
+                        }
+
                 }
             }
         }
