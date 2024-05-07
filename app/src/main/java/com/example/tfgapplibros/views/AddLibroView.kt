@@ -2,11 +2,15 @@ package com.example.tfgapplibros.views
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
@@ -14,11 +18,15 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,11 +37,40 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.tfgprueba.R
+import androidx.navigation.NavHostController
+import com.example.tfgapplibros.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddLibro() {
+
+fun AddLibro(
+    navController: NavHostController
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { "Nuevo Libro" },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        navController.popBackStack()
+                    }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                            contentDescription = ""
+                        )
+                    }
+                })
+        }
+    ) {
+        AddLibroContenido(it = it);
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddLibroContenido(
+    it: PaddingValues,
+) {
     val listaGeneros = listOf("Ficción", "Ciencia ficción", "Fantasía", "Misterio", "Romance")
 
     var titulo by remember { mutableStateOf("") }
@@ -41,9 +78,8 @@ fun AddLibro() {
     var generoSeleccionado by remember { mutableStateOf(listaGeneros.first()) }
     var estadoLibro by remember { mutableStateOf(1) }
     var expanded by remember { mutableStateOf(false) }
-    var selectedOptionText by remember { mutableStateOf(listaGeneros[0]) }
 
-    Surface(color = MaterialTheme.colorScheme.background) {
+    Surface(color = MaterialTheme.colorScheme.background, modifier = Modifier.padding(top= 40.dp)) {
         Column(
             modifier = Modifier
                 .padding(16.dp)
@@ -79,10 +115,9 @@ fun AddLibro() {
                 onExpandedChange = { expanded = it },
             ) {
                 OutlinedTextField(
-                    // The `menuAnchor` modifier must be passed to the text field for correctness.
                     modifier = Modifier.menuAnchor(),
                     readOnly = true,
-                    value = selectedOptionText,
+                    value = generoSeleccionado,
                     onValueChange = {},
                     label = { Text("Label") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
@@ -92,11 +127,11 @@ fun AddLibro() {
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
                 ) {
-                    listaGeneros.forEach { selectionOption ->
+                    listaGeneros.forEach { selec ->
                         DropdownMenuItem(
-                            text = { Text(selectionOption) },
+                            text = { Text(selec) },
                             onClick = {
-                                selectedOptionText = selectionOption
+                                generoSeleccionado = selec
                                 expanded = false
                             },
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,

@@ -22,29 +22,29 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             TfgAppLibrosTheme {
-                    val navController = rememberNavController()
-                    NavHost(
-                        navController = navController,
-                        startDestination = "login"
-                    ) {
-                        composable("login") {
-                            LoginView(navController)
-                        }
-                        composable("registro") {
-                            RegisterView(navController)
-                        }
-                        composable("principal") {
-                            Principal(navController)
-                        }
-                        composable("perfil") {
-                            Perfil()
-                        }
-                        composable("libro") {
-                            LibroView()
-                        }
-                        composable("addlibro") {
-                            AddLibro()
-                        }
+                val navController = rememberNavController()
+                NavHost(
+                    navController = navController,
+                    startDestination = "login"
+                ) {
+                    composable("login") {
+                        LoginView(navController)
+                    }
+                    composable("registro") {
+                        RegisterView(navController)
+                    }
+                    composable("principal") {
+                        Principal(navController)
+                    }
+                    composable("perfil") {
+                        Perfil(navController)
+                    }
+                    composable("libro") {
+                        LibroView()
+                    }
+                    composable("addlibro") {
+                        AddLibro(navController)
+                    }
 
                 }
             }

@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -22,9 +23,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,42 +41,62 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import com.example.tfgapplibros.R
 
+val generos = listOf("Ficción", "Fantasía", "Misterio")
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Perfil(
+    navController: NavHostController
 ) {
-    Column (
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally) {
-        //La topbar igual la cambiaré por una apptopbar
-        TopBar()
-        DatosPerfil()
-        MisLibros()
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { "Mi Perfil" },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        navController.popBackStack()
+                    }) {
+                        //TODO: Sustituir por icono flecha atras
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                            contentDescription = ""
+                        )
+                    }
+                })
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                navController.navigate("addlibro")
+            }) {
+                //TODO: Sustituir por icono de Mas
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                    contentDescription = ""
+                )
+            }
+        }
+    ) {
+        Contenido(it = it, navController = navController);
     }
 }
-@Composable
-fun TopBar(
-    modifier: Modifier = Modifier
-) {
-    Row (
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(color = Color.LightGray)
 
+@Composable
+fun Contenido(
+    it: PaddingValues,
+    navController: NavHostController
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 90.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Icon(
-            imageVector = Icons.Default.ArrowBack,
-            contentDescription = "Back",
-            tint = Color.Black,
-            modifier = Modifier.size(40.dp))
-        Icon(
-            // Camiar el icono por o rueda ajustes o tres puntos
-            painterResource(id = R.drawable.ic_launcher_foreground),
-            contentDescription = "Back",
-            tint = Color.Black,
-            modifier = Modifier.size(40.dp))
+        //La topbar igual la cambiaré por una apptopbar
+        DatosPerfil()
+        MisLibros(navController)
     }
 }
 
@@ -78,45 +104,57 @@ fun TopBar(
 fun DatosPerfil(
     modifier: Modifier = Modifier
 ) {
-    Column (
-        horizontalAlignment = Alignment.CenterHorizontally ,
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxWidth()
             .background(color = Color.Gray)
             .padding(vertical = 12.dp)
-    ){
-        Row (
+    ) {
+        Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
                 .fillMaxWidth()
         ) {
             //Cambiar imagen a imagen de perfil
-            ImagenRedonda(image = painterResource(
-                id = R.drawable.ic_launcher_foreground),
+            ImagenRedonda(
+                image = painterResource(
+                    id = R.drawable.ic_launcher_foreground
+                ),
                 modifier = Modifier
                     .size(130.dp)
                     .weight(4f)
                     .padding(start = 10.dp)
             )
             Spacer(modifier = Modifier.width(16.dp))
-            Biografia(modifier = Modifier.weight(7f).padding(end = 12.dp))
+            Biografia(
+                modifier = Modifier
+                    .weight(7f)
+                    .padding(end = 12.dp)
+            )
         }
-        Row ( verticalAlignment = Alignment.CenterVertically,
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
                 .fillMaxWidth()
-        ){
+        ) {
             // Generos con el Lazy grid
-            Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
                     text = "Mis Gustos:",
                     fontSize = 16.sp,
                     modifier = Modifier.padding(bottom = 4.dp, top = 12.dp),
-                    fontWeight = FontWeight.Bold)
+                    fontWeight = FontWeight.Bold
+                )
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(100.dp),
-                    modifier = Modifier.padding(horizontal = 20.dp))
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                )
                 {
-                    items(generos) {gen ->
+                    items(generos) { gen ->
                         CajaGenero(nombre = gen)
                     }
                 }
@@ -125,32 +163,37 @@ fun DatosPerfil(
     }
 
 }
+
 @Composable
 fun Biografia(
     modifier: Modifier = Modifier,
 ) {
-    Column (
+    Column(
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.SpaceAround,
         modifier = modifier
-    ){
+    ) {
         Text(text = "Nombre de Usuario", fontSize = 20.sp)
         Text(text = "Ciudad, Pais", fontSize = 16.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(8.dp))
-        Text(text = "Una breve descripcion de uno mismo, con que libros le gusta leer y poco más.", fontSize = 16.sp, lineHeight = 18.sp)
+        Text(
+            text = "Una breve descripcion de uno mismo, con que libros le gusta leer y poco más.",
+            fontSize = 16.sp,
+            lineHeight = 18.sp
+        )
 
     }
 }
 
 @Composable
 fun MisLibros(
-    modifier: Modifier = Modifier
+    navController: NavHostController
 ) {
-    Column (
+    Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.Start
     ) {
-        Row (
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(color = Color.LightGray)
@@ -159,14 +202,17 @@ fun MisLibros(
         }
         // Lazy column with frames
         LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 178.dp)) {
+            //TODO: Esto tendre que tomarlo de firebase cuando tengamos la base de datos
             items(10) { index ->
-                CajaLibro(nombre = "Libro $index", image = painterResource(id = R.drawable.ic_launcher_foreground))
+                CajaLibro(
+                    nombre = "Libro $index",
+                    image = painterResource(id = R.drawable.ic_launcher_foreground),
+                    navController = navController
+                )
             }
         }
     }
 }
-
-
 
 @Composable
 fun ImagenRedonda(
@@ -204,7 +250,8 @@ fun CajaGenero(
                 .padding(4.dp),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = nombre,
+            Text(
+                text = nombre,
                 color = Color.White,
                 fontSize = 14.sp
             )
@@ -216,13 +263,18 @@ fun CajaGenero(
 fun CajaLibro(
     nombre: String,
     image: Painter,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavHostController
+
 ) {
     Surface(
         modifier = Modifier
             .padding(8.dp),
         shape = RoundedCornerShape(20),
-        color = Color.LightGray
+        color = Color.LightGray,
+        onClick = {
+            navController.navigate("libro")
+        }
     ) {
         Column(
             modifier = Modifier
@@ -237,7 +289,8 @@ fun CajaLibro(
                     .aspectRatio(.85f, matchHeightConstraintsFirst = true)
                     .padding(2.dp)
             )
-            Text(text = nombre,
+            Text(
+                text = nombre,
                 color = Color.Black,
                 fontSize = 16.sp
             )

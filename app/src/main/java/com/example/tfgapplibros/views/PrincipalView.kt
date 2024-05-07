@@ -39,13 +39,13 @@ fun Principal(
     navController: NavHostController
 ) {
     Scaffold(
-        topBar = { TopBar(navController) }, content = { PaginaPrincipal(it) }
+        topBar = { TopBarPrincipal(navController) }, content = { PaginaPrincipal(it) }
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(
+fun TopBarPrincipal(
     navController: NavHostController
 ) {
     TopAppBar(
