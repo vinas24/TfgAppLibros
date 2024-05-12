@@ -12,7 +12,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -48,14 +51,14 @@ fun AddLibro(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { "Nuevo Libro" },
+            CenterAlignedTopAppBar(
+                title = { Text("Nuevo Libro") },
                 navigationIcon = {
                     IconButton(onClick = {
                         navController.popBackStack()
                     }) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = ""
                         )
                     }
@@ -79,7 +82,10 @@ fun AddLibroContenido(
     var estadoLibro by remember { mutableStateOf(1) }
     var expanded by remember { mutableStateOf(false) }
 
-    Surface(color = MaterialTheme.colorScheme.background, modifier = Modifier.padding(top= 40.dp)) {
+    Surface(
+        color = MaterialTheme.colorScheme.background,
+        modifier = Modifier.padding(top = 40.dp)
+    ) {
         Column(
             modifier = Modifier
                 .padding(16.dp)

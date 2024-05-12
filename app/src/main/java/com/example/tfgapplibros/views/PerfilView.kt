@@ -22,7 +22,10 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -53,15 +56,15 @@ fun Perfil(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { "Mi Perfil" },
+            CenterAlignedTopAppBar(
+                title = { Text("Mi Perfil") },
                 navigationIcon = {
                     IconButton(onClick = {
                         navController.popBackStack()
                     }) {
                         //TODO: Sustituir por icono flecha atras
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = ""
                         )
                     }
@@ -71,10 +74,9 @@ fun Perfil(
             FloatingActionButton(onClick = {
                 navController.navigate("addlibro")
             }) {
-                //TODO: Sustituir por icono de Mas
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                    contentDescription = ""
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add libro"
                 )
             }
         }

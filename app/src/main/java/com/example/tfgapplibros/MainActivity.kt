@@ -16,7 +16,7 @@ import com.example.tfgapplibros.views.Principal
 import com.example.tfgapplibros.views.RegisterView
 
 class MainActivity : ComponentActivity() {
-    //Aún más exótico//
+    //TODO: meter logica para el login, si el usuario ya esta registrado, que entre
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

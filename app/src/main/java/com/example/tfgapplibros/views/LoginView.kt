@@ -1,11 +1,14 @@
 package com.example.tfgapplibros.views
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -21,15 +24,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.tfgapplibros.components.CampoContrasena
+import com.example.tfgapplibros.components.CampoTexto
+import com.example.tfgapplibros.model.LoginViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginView(
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: LoginViewModel = viewModel()
 ) {
     Scaffold {
-        Login(it, navController)
+        Login(it, navController,viewModel)
     }
 }
 
@@ -38,6 +46,7 @@ fun LoginView(
 fun Login(
     it: PaddingValues,
     navController: NavHostController,
+    viewModel: LoginViewModel
 ) {
     var usuario by remember { mutableStateOf("") }
     var passwd by remember { mutableStateOf("") }
@@ -47,37 +56,46 @@ fun Login(
             .padding(it)
             .padding(top = 30.dp)
             .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
         Text(
             text = "Iniciar Sesión",
             style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Bold)
         )
-        OutlinedTextField(
-            value = usuario, onValueChange = { usuario = it },
-            label = { Text(text = "Nombre de Usuario") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 30.dp)
-                .padding(bottom = 15.dp)
-        )
-        OutlinedTextField(
-            value = passwd, onValueChange = { passwd = it },
-            label = { Text(text = "Contraseña") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 30.dp)
-                .padding(bottom = 15.dp)
-        )
+        CampoTexto(
+            text = usuario,
+            onTextChanged = { usuario = it },
+            label = "Nombre de Usuario")
+
+        Spacer(
+            modifier = Modifier.size(16.dp))
+
+        CampoContrasena(
+            password = passwd,
+            onPasswordChanged = { passwd = it },
+            label = "Contrasena")
+
+        Spacer(
+            modifier = Modifier.size(16.dp))
+
         Text(
             text = "No tienes cuenta todavia?",
-            Modifier.clickable(onClick = { navController.navigate("Registro") })
+           modifier = Modifier.clickable(onClick = { navController.navigate("Registro")})
         )
+
+        Spacer(
+            modifier = Modifier.size(8.dp))
 
         Button(
             onClick = {
-                if (passwd != "" && usuario != "")
-                    navController.navigate("principal")
+                if (passwd != "" && usuario != "") {
+                    viewModel.signInConCorreoContrasena(email = usuario, passwd = passwd) {
+                        navController.navigate("Principal")
+                    }
+                }
+
+                    //navController.navigate("principal")
             }
         ) {
             Text(text = "Entrar")
