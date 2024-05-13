@@ -1,22 +1,22 @@
 package com.example.tfgapplibros.views
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContent
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -29,9 +29,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -39,9 +39,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.tfgapplibros.R
+import com.example.tfgapplibros.components.CampoSlider
+import com.example.tfgapplibros.components.CampoTexto
+import com.example.tfgapplibros.components.CampoTextoLargo
+import com.example.tfgapplibros.model.Autentificacion
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,6 +55,7 @@ import com.example.tfgapplibros.R
 fun AddLibro(
     navController: NavHostController
 ) {
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -74,58 +81,68 @@ fun AddLibro(
 fun AddLibroContenido(
     it: PaddingValues,
 ) {
+    val userActivo = Autentificacion.usuarioActualUid
+
     val listaGeneros = listOf("Ficción", "Ciencia ficción", "Fantasía", "Misterio", "Romance")
+    val listaEstados = listOf("Mucho uso","Uso Moderado","Poco Uso","Como nuevo","Nuevo")
 
     var titulo by remember { mutableStateOf("") }
     var autor by remember { mutableStateOf("") }
+    var descripcion by remember { mutableStateOf("") }
     var generoSeleccionado by remember { mutableStateOf(listaGeneros.first()) }
-    var estadoLibro by remember { mutableStateOf(1) }
+    var estadoLibro by remember { mutableIntStateOf(1) }
+    var estadoLibroTexto by remember { mutableStateOf((listaEstados[estadoLibro-1]))}
+
+    //var ImagenLibroUri by
     var expanded by remember { mutableStateOf(false) }
 
     Surface(
         color = MaterialTheme.colorScheme.background,
-        modifier = Modifier.padding(top = 40.dp)
+        modifier = Modifier.padding(top = 100.dp)
     ) {
         Column(
             modifier = Modifier
                 .padding(16.dp)
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+
         ) {
-            Text(text = "Nuevo Libro")
+
+            CampoTexto(
+                text = titulo,
+                onTextChanged = { titulo = it },
+                label = "Título del Libro",
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Next
+                )
+            )
+
             Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = titulo,
-                onValueChange = { titulo = it },
-                label = { Text("Título del Libro") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(8.dp)
+            CampoTexto(
+                text = autor,
+                onTextChanged = { autor = it },
+                label = "Autor del Libro",
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Done
+                )
             )
-            Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = autor,
-                onValueChange = { autor = it },
-                label = { Text("Autor del Libro") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(8.dp)
-            )
             Spacer(modifier = Modifier.height(16.dp))
 
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = { expanded = it },
+                modifier = Modifier.padding(horizontal = 30.dp)
             ) {
                 OutlinedTextField(
                     modifier = Modifier.menuAnchor(),
                     readOnly = true,
                     value = generoSeleccionado,
-                    onValueChange = {},
-                    label = { Text("Label") },
+                    onValueChange = { generoSeleccionado = it },
+                    label = { Text("Genero") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     colors = ExposedDropdownMenuDefaults.textFieldColors(),
                 )
@@ -145,15 +162,14 @@ fun AddLibroContenido(
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(16.dp))
 
-            Slider(
+            Spacer(modifier = Modifier.height(32.dp))
+
+            CampoSlider(
                 value = estadoLibro.toFloat(),
-                onValueChange = { estadoLibro = it.toInt() },
-                valueRange = 1f..10f,
-                steps = 9,
-                modifier = Modifier.fillMaxWidth()
-            )
+                onValueChange = {estadoLibro = it.toInt()},
+                label = "Estado:  $estadoLibroTexto", num = 5)
+
             Spacer(modifier = Modifier.height(16.dp))
 
             Image(
@@ -165,6 +181,8 @@ fun AddLibroContenido(
                 contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.height(16.dp))
+
+            CampoTextoLargo(text = descripcion, onTextChanged = {descripcion = it}, label = "Mas informacion")
 
             Button(
                 onClick = { /* Agregar lógica para agregar el libro */ },

@@ -6,13 +6,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,6 +22,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -37,7 +38,7 @@ fun LoginView(
     viewModel: LoginViewModel = viewModel()
 ) {
     Scaffold {
-        Login(it, navController,viewModel)
+        Login(it, navController, viewModel)
     }
 }
 
@@ -50,6 +51,7 @@ fun Login(
 ) {
     var usuario by remember { mutableStateOf("") }
     var passwd by remember { mutableStateOf("") }
+    val camposNoVacios = usuario.isNotEmpty() && passwd.isNotEmpty()
 
     Column(
         modifier = Modifier
@@ -66,36 +68,54 @@ fun Login(
         CampoTexto(
             text = usuario,
             onTextChanged = { usuario = it },
-            label = "Nombre de Usuario")
+            label = "Nombre de Usuario",
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next
+            ),
+        )
 
         Spacer(
-            modifier = Modifier.size(16.dp))
+            modifier = Modifier.size(16.dp)
+        )
 
         CampoContrasena(
             password = passwd,
             onPasswordChanged = { passwd = it },
-            label = "Contrasena")
-
-        Spacer(
-            modifier = Modifier.size(16.dp))
-
-        Text(
-            text = "No tienes cuenta todavia?",
-           modifier = Modifier.clickable(onClick = { navController.navigate("Registro")})
+            label = "Contrasena",
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Done
+            ),
         )
 
         Spacer(
-            modifier = Modifier.size(8.dp))
+            modifier = Modifier.size(16.dp)
+        )
+
+        Text(
+            text = "No tienes cuenta todavia?",
+            modifier = Modifier.clickable(onClick = { navController.navigate("Registro") })
+        )
+
+        Spacer(
+            modifier = Modifier.size(8.dp)
+        )
 
         Button(
+            enabled = camposNoVacios,
             onClick = {
-                if (passwd != "" && usuario != "") {
-                    viewModel.signInConCorreoContrasena(email = usuario, passwd = passwd) {
-                        navController.navigate("Principal")
-                    }
-                }
 
-                    //navController.navigate("principal")
+                viewModel.signInConCorreoContrasena(email = usuario, passwd = passwd) {
+                    navController.navigate("Principal")
+
+                }
+                //Reseteamos los campos
+                usuario = ""
+                passwd = ""
+
+                //Para Probar la app, comentar el If y descomentar la siguente linea
+                //navController.navigate("principal")
             }
         ) {
             Text(text = "Entrar")
