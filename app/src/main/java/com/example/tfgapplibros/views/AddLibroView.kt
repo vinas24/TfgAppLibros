@@ -1,10 +1,14 @@
 package com.example.tfgapplibros.views
 
-import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,36 +30,38 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import com.example.tfgapplibros.R
 import com.example.tfgapplibros.components.CampoSlider
 import com.example.tfgapplibros.components.CampoTexto
 import com.example.tfgapplibros.components.CampoTextoLargo
+import com.example.tfgapplibros.model.AddLibroViewModel
 import com.example.tfgapplibros.model.Autentificacion
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-
 fun AddLibro(
-    navController: NavHostController
+    navController: NavHostController, viewModel: AddLibroViewModel = viewModel()
 ) {
-
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -72,29 +78,35 @@ fun AddLibro(
                 })
         }
     ) {
-        AddLibroContenido(it = it);
+        AddLibroContenido(it = it, viewModel = viewModel);
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddLibroContenido(
+    viewModel: AddLibroViewModel,
     it: PaddingValues,
 ) {
     val userActivo = Autentificacion.usuarioActualUid
-
     val listaGeneros = listOf("Ficción", "Ciencia ficción", "Fantasía", "Misterio", "Romance")
-    val listaEstados = listOf("Mucho uso","Uso Moderado","Poco Uso","Como nuevo","Nuevo")
 
-    var titulo by remember { mutableStateOf("") }
-    var autor by remember { mutableStateOf("") }
-    var descripcion by remember { mutableStateOf("") }
-    var generoSeleccionado by remember { mutableStateOf(listaGeneros.first()) }
-    var estadoLibro by remember { mutableIntStateOf(1) }
-    var estadoLibroTexto by remember { mutableStateOf((listaEstados[estadoLibro-1]))}
-
-    //var ImagenLibroUri by
+    val titulo by viewModel.titulo.observeAsState("")
+    val autor by viewModel.autor.observeAsState("")
+    val descripcion by viewModel.descripcion.observeAsState("")
+    val imageUriSelec by viewModel.imgUri.observeAsState()
+    val estadoLibro by viewModel.estado.observeAsState(1)
+    //Dropdown
+    val generoSeleccionado by viewModel.genero.observeAsState("")
     var expanded by remember { mutableStateOf(false) }
+    //Imagen
+    val placeholderId = R.drawable.ic_launcher_background
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri -> uri?.let { viewModel.newImagenSelec(uri) } }
+    )
+    val camposRellenos =
+        titulo.isNotEmpty() && autor.isNotEmpty() && generoSeleccionado.isNotEmpty() && imageUriSelec != null
 
     Surface(
         color = MaterialTheme.colorScheme.background,
@@ -107,29 +119,25 @@ fun AddLibroContenido(
                 .verticalScroll(rememberScrollState())
 
         ) {
-
             CampoTexto(
                 text = titulo,
-                onTextChanged = { titulo = it },
+                onTextChanged = { viewModel.tituloChange(it) },
                 label = "Título del Libro",
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Next
                 )
             )
-
             Spacer(modifier = Modifier.height(16.dp))
-
             CampoTexto(
                 text = autor,
-                onTextChanged = { autor = it },
+                onTextChanged = { viewModel.autorChange(it) },
                 label = "Autor del Libro",
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done
                 )
             )
-
             Spacer(modifier = Modifier.height(16.dp))
 
             ExposedDropdownMenuBox(
@@ -141,7 +149,7 @@ fun AddLibroContenido(
                     modifier = Modifier.menuAnchor(),
                     readOnly = true,
                     value = generoSeleccionado,
-                    onValueChange = { generoSeleccionado = it },
+                    onValueChange = { viewModel.generoChange(it) },
                     label = { Text("Genero") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     colors = ExposedDropdownMenuDefaults.textFieldColors(),
@@ -154,7 +162,7 @@ fun AddLibroContenido(
                         DropdownMenuItem(
                             text = { Text(selec) },
                             onClick = {
-                                generoSeleccionado = selec
+                                viewModel.generoChange(selec)
                                 expanded = false
                             },
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
@@ -167,25 +175,64 @@ fun AddLibroContenido(
 
             CampoSlider(
                 value = estadoLibro.toFloat(),
-                onValueChange = {estadoLibro = it.toInt()},
-                label = "Estado:  $estadoLibroTexto", num = 5)
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Image(
-                painter = painterResource(id = R.drawable.ic_launcher_background),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp),
-                contentScale = ContentScale.Crop
+                onValueChange = { viewModel.estadoChange(it.toInt()) }
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
+            if (imageUriSelec != null) {
+                AsyncImage(
+                    model = imageUriSelec,
+                    contentDescription = null,
+
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 30.dp)
+                        .aspectRatio(3f / 4f)
+                        .clip(RoundedCornerShape(16.dp))
+                        .clickable(onClick = {
+                            photoPickerLauncher.launch(
+                                PickVisualMediaRequest(
+                                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                                )
+                            )
+                        }),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = placeholderId),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 30.dp)
+                        .aspectRatio(3f / 4f)
+                        .clip(RoundedCornerShape(16.dp))
+                        .clickable(onClick = {
+                            photoPickerLauncher.launch(
+                                PickVisualMediaRequest(
+                                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                                )
+                            )
+                        }),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
 
-            CampoTextoLargo(text = descripcion, onTextChanged = {descripcion = it}, label = "Mas informacion")
+            CampoTextoLargo(
+                text = descripcion,
+                onTextChanged = { viewModel.descripcionChange(it) },
+                label = "Mas informacion"
+            )
 
             Button(
-                onClick = { /* Agregar lógica para agregar el libro */ },
+                enabled = camposRellenos,
+                onClick = {
+                    if (userActivo != null) {
+                        viewModel.guardarLibro(userActivo)
+                    }
+                },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
 
@@ -194,3 +241,4 @@ fun AddLibroContenido(
         }
     }
 }
+

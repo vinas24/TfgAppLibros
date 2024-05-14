@@ -15,7 +15,8 @@ import kotlinx.coroutines.launch
 class LoginViewModel: ViewModel() {
     private val auth: FirebaseAuth = Firebase.auth
     private val _loading = MutableLiveData(false)
-    private val _loginError = MutableLiveData<String?>()
+    private val _loginError = MutableLiveData<String>(null)
+    val loginError: LiveData<String> get() = _loginError
 
     fun signInConCorreoContrasena(email: String, passwd: String, principal: ()-> Unit)
     = viewModelScope.launch {
@@ -26,7 +27,6 @@ class LoginViewModel: ViewModel() {
                         principal()
                     } else {
                         _loginError.value = "Error al iniciar sesion. Comprueba tus credenciales."
-
                     }
                 }
         } catch (es: Exception) {

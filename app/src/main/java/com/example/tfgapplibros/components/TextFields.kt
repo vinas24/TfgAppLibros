@@ -54,6 +54,7 @@ fun CampoTexto(
             .padding(horizontal = 30.dp)
     )
 }
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CampoTextoLargo(
@@ -71,13 +72,13 @@ fun CampoTextoLargo(
             keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Default,
 
-        ),
+            ),
         modifier = modifier
             .fillMaxWidth()
             .height(250.dp)
             .padding(horizontal = 30.dp),
 
-    )
+        )
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -105,19 +106,20 @@ fun CampoContrasena(
 @Composable
 fun CampoSlider(
     value: Float,
-    onValueChange: (Float) -> Unit,
-    modifier: Modifier = Modifier,
-    label: String,
-    num: Int
+    onValueChange: (Float) -> Unit
 ) {
-    Column(modifier = modifier) {
-        Text(text = label, modifier = Modifier.padding(horizontal = 60.dp))
+    val listaEstados =
+        listOf("Mucho uso", "Uso Moderado", "Poco Uso", "Como nuevo", "Nuevo")
+    var estadoLibroTexto = listaEstados[(value - 1).toInt()]
+
+    Column() {
+        Text(text = "Estado:  $estadoLibroTexto", modifier = Modifier.padding(horizontal = 60.dp))
         Spacer(modifier = Modifier.height(4.dp))
         Slider(
             value = value,
             onValueChange = onValueChange,
             valueRange = 1f..5f,
-            steps = num,
+            steps = 3,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 40.dp)
