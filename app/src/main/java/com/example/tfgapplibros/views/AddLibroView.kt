@@ -78,7 +78,7 @@ fun AddLibro(
                 })
         }
     ) {
-        AddLibroContenido(it = it, viewModel = viewModel);
+        AddLibroContenido(it = it, viewModel = viewModel, navController = navController);
     }
 }
 
@@ -87,6 +87,7 @@ fun AddLibro(
 fun AddLibroContenido(
     viewModel: AddLibroViewModel,
     it: PaddingValues,
+    navController: NavHostController
 ) {
     val userActivo = Autentificacion.usuarioActualUid
     val listaGeneros = listOf("Ficción", "Ciencia ficción", "Fantasía", "Misterio", "Romance")
@@ -230,7 +231,9 @@ fun AddLibroContenido(
                 enabled = camposRellenos,
                 onClick = {
                     if (userActivo != null) {
-                        viewModel.guardarLibro(userActivo)
+                        viewModel.guardarLibro(userActivo) {
+                            navController.navigate("perfil")
+                        }
                     }
                 },
                 modifier = Modifier.align(Alignment.CenterHorizontally)

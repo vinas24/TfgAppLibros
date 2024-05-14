@@ -59,7 +59,7 @@ class AddLibroViewModel : ViewModel() {
         _imgUri.value = newUri
     }
 
-    fun guardarLibro(userId: String) {
+    fun guardarLibro(userId: String, perfil: () -> Unit) {
         val titulo = _titulo.value.orEmpty()
         val autor = _autor.value.orEmpty()
         val genero = _genero.value.orEmpty()
@@ -83,6 +83,7 @@ class AddLibroViewModel : ViewModel() {
         libroRepo.guardarLibro(userId, libro, img,
             onSuccess = {
                 _mensOk.value = "Libro anadido"
+                perfil()
             },
             onFailure = {
                 _mensError.value = "No se pudo guardar el libro"
