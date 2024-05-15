@@ -48,7 +48,6 @@ fun RegisterView(
                 title = { "REGISTRO" },
                 navigationIcon = {
                     IconButton(onClick = {
-                        // Move back
                         navController.popBackStack()
                     }) {
                         Icon(

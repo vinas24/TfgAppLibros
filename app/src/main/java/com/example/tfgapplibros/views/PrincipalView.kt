@@ -1,6 +1,5 @@
 package com.example.tfgapplibros.views
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -18,7 +17,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,13 +37,13 @@ fun Principal(
     navController: NavHostController
 ) {
     Scaffold(
-        topBar = { TopBar(navController) }, content = { PaginaPrincipal(it) }
+        topBar = { TopBarPrincipal(navController) }, content = { PaginaPrincipal(it) }
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(
+fun TopBarPrincipal(
     navController: NavHostController
 ) {
     TopAppBar(
