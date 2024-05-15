@@ -90,7 +90,7 @@ fun AddLibroContenido(
     navController: NavHostController
 ) {
     val userActivo = Autentificacion.usuarioActualUid
-    val listaGeneros = listOf("Ficción", "Ciencia ficción", "Fantasía", "Misterio", "Romance")
+    val listaGeneros = listOf("Ficcion", "Ciencia ficcion", "Fantasia", "Misterio", "Romance")
 
     val titulo by viewModel.titulo.observeAsState("")
     val autor by viewModel.autor.observeAsState("")

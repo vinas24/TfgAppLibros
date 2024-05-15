@@ -1,5 +1,6 @@
 package com.example.tfgapplibros.views
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -24,7 +25,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -33,8 +33,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,8 +46,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.tfgapplibros.R
+import com.example.tfgapplibros.components.CartaLibroPerfil
+import com.example.tfgapplibros.data.Libro
+import com.example.tfgapplibros.model.Autentificacion
+import com.example.tfgapplibros.model.PerfilViewModel
+
 
 val generos = listOf("Ficción", "Fantasía", "Misterio")
 
@@ -88,8 +96,17 @@ fun Perfil(
 @Composable
 fun Contenido(
     it: PaddingValues,
-    navController: NavHostController
+    navController: NavHostController,
 ) {
+    val userId = Autentificacion.usuarioActualUid
+    val viewModel: PerfilViewModel = viewModel()
+
+    val libros by viewModel.libros.collectAsState()
+    if (userId != null) {
+        LaunchedEffect(userId) {
+            viewModel.obtenerLibros(userId = userId)
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -98,7 +115,7 @@ fun Contenido(
     ) {
         //La topbar igual la cambiaré por una apptopbar
         DatosPerfil()
-        MisLibros(navController)
+        MisLibros(navController, libros)
     }
 }
 
@@ -189,7 +206,8 @@ fun Biografia(
 
 @Composable
 fun MisLibros(
-    navController: NavHostController
+    navController: NavHostController,
+    libros: List<Libro>
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -202,16 +220,18 @@ fun MisLibros(
         ) {
             Text(text = "Mis Libros:", fontSize = 20.sp, modifier = Modifier.padding(12.dp))
         }
-        // Lazy column with frames
-        LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 178.dp)) {
-            //TODO: Esto tendre que tomarlo de firebase cuando tengamos la base de datos
-            items(10) { index ->
-                CajaLibro(
-                    nombre = "Libro $index",
-                    image = painterResource(id = R.drawable.ic_launcher_foreground),
-                    navController = navController
-                )
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 178.dp),
+            modifier = Modifier.padding(4.dp)
+        ) {
+            items(libros) {libro ->
+                CartaLibroPerfil(libro = libro) {
+                    //TODO: Esto hay que hacxerlo de tal modo que se vea el libro
+                    navController.navigate("libro")
+                }
+
             }
+
         }
     }
 }

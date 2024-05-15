@@ -1,8 +1,12 @@
 package com.example.tfgapplibros.data
 
 import android.net.Uri
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.tasks.await
+import okhttp3.internal.wait
+import kotlin.math.log
 
 class LibroRepository {
     private val db = FirebaseFirestore.getInstance()
@@ -45,4 +49,26 @@ class LibroRepository {
             .addOnFailureListener { onFailure(it) }
 
     }
+
+    suspend fun librosDelUsuario(userId: String): List<Libro> {
+        val libros = mutableListOf<Libro>()
+        try {
+            val snapshot = db
+                .collection("usuarios")
+                .document(userId)
+                .collection("libros")
+                .get()
+                .await()
+            for (doc in snapshot.documents) {
+                val libro = doc.toObject(Libro::class.java)
+                libro?.let { libros.add(libro) }
+
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return libros
+    }
+
+
 }
