@@ -48,8 +48,8 @@ class MainActivity : ComponentActivity() {
                     composable("perfil") {
                         Perfil(navController)
                     }
-                    composable("libro") {
-                        LibroView()
+                    composable("libro/{libroId}") {
+                        LibroView(navController, libroId = it.arguments?.getString("libroId"))
                     }
                     composable("addlibro") {
                         AddLibro(navController)

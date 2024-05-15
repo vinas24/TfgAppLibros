@@ -227,7 +227,7 @@ fun MisLibros(
             items(libros) {libro ->
                 CartaLibroPerfil(libro = libro) {
                     //TODO: Esto hay que hacxerlo de tal modo que se vea el libro
-                    navController.navigate("libro")
+                    navController.navigate("libro/${libro.libroId}")
                 }
 
             }

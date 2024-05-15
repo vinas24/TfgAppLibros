@@ -3,6 +3,7 @@ package com.example.tfgapplibros.data
 import android.net.Uri
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
 import okhttp3.internal.wait
@@ -26,7 +27,7 @@ class LibroRepository {
             imgRef.putFile(imgUri)
                 .addOnSuccessListener {
                     imgRef.downloadUrl.addOnSuccessListener {
-                        val libroActualizado = libro.copy(imgUrl = it.toString())
+                        val libroActualizado = libro.copy(imgUrl = it.toString(), libroId = libroId)
                         guardarLibroDb(userId, libroId, libroActualizado, onSuccess, onFailure)
                     }.addOnFailureListener { onFailure(it) }
                 }.addOnFailureListener { onFailure(it) }
@@ -68,6 +69,28 @@ class LibroRepository {
             e.printStackTrace()
         }
         return libros
+    }
+
+    suspend fun obtenerLibroPorId(libroId: String, userId: String): Libro? {
+        return try {
+            val doc = db
+                .collection("usuarios")
+                .document(userId)
+                .collection("libros")
+                .document(libroId)
+                .get()
+                .await()
+            if (doc.exists()) {
+                val libro = doc.toObject(Libro::class.java)
+
+                libro
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 
 
