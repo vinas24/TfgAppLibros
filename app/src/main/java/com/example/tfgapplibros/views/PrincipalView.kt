@@ -32,6 +32,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.tfgapplibros.PerfilScreen
+import com.example.tfgapplibros.data.Libro
 import com.example.tfgapplibros.model.Autentificacion
 
 @Composable
@@ -146,3 +147,4 @@ fun MyCard(title: String, author: String, image: ImageBitmap?) {
         }
     }
 }
+

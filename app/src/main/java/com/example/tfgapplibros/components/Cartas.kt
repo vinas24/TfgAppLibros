@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -37,7 +39,7 @@ fun CartaLibroPerfil(
         onClick = onclick,
         modifier = Modifier
             .padding(4.dp),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
@@ -56,22 +58,20 @@ fun CartaLibroPerfil(
                     .padding(bottom = 8.dp)
                     .clip(
                         RoundedCornerShape(
-                            topStart = 12.dp,
-                            topEnd = 12.dp,
+                            topStart = 8.dp,
+                            topEnd = 8.dp,
                             bottomStart = 4.dp,
                             bottomEnd = 4.dp
                         )
                     )
             )
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-                .align(Alignment.Start)) {
-                Text(
-                    text = libro.titulo,
-                    color = Color.Black,
-                    fontSize = 16.sp
-                )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+                    .align(Alignment.Start)
+            ) {
+                TextoCarta(tit = libro.titulo, aut = libro.autor, genero = libro.genero)
             }
 
 

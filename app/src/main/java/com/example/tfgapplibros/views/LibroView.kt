@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.foundation.background
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -12,13 +13,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -35,14 +42,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.example.tfgapplibros.components.ImagenConLikeButton
 import com.example.tfgapplibros.components.RatingStar
+import com.example.tfgapplibros.components.acortarTxt
 import com.example.tfgapplibros.data.Libro
+import com.example.tfgapplibros.model.Autentificacion
 import com.example.tfgapplibros.model.LibroViewModel
 
 
@@ -88,6 +98,33 @@ fun ContenidoLibro(
                             contentDescription = "Volver"
                         )
                     }
+                },
+                actions = {
+                    if (libro.userId == Autentificacion.usuarioActualUid) {
+                        var expanded by remember { mutableStateOf(false) }
+                        val opciones = listOf("Modificar", "Eliminar")
+                        IconButton(
+                            onClick = { expanded = true }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = "Mas opciones"
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Modificar") },
+                                onClick = { /*TODO: Metodo que modifica el libro*/ })
+                            Divider(modifier = Modifier.padding(horizontal = 8.dp))
+                            DropdownMenuItem(
+                                text = { Text("Eliminar") },
+                                onClick = { /*TODO: metodo que elimina el libro*/ })
+                        }
+                    }
+
                 })
         }
     ) {
@@ -99,16 +136,7 @@ fun ContenidoLibro(
             verticalArrangement = Arrangement.Top,
 
             ) {
-            AsyncImage(
-                model = libro.imgUrl,
-                contentDescription = "Libro",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(3f / 4f)
-                    .padding(bottom = 16.dp),
-            )
-
+            ImagenConLikeButton(libro = libro)
             Column(
                 modifier = Modifier.padding(
                     horizontal = 16.dp
@@ -123,10 +151,10 @@ fun ContenidoLibro(
                     Text(
                         modifier = Modifier
                             .padding(vertical = 8.dp),
-                        text = libro.titulo,
+                        text = libro.titulo.acortarTxt(20),
                         style = MaterialTheme.typography.headlineLarge
                     )
-                    CajaGenero(nombre = libro.genero)
+                    CajaGenero(nombre = libro.genero, 14.sp)
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -134,20 +162,22 @@ fun ContenidoLibro(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = libro.autor,
+                        text = libro.autor.acortarTxt(20),
                         style = MaterialTheme.typography.titleLarge
                     )
                     RatingStar(estado = libro.estado)
 
                 }
-                Surface (
+                Surface(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(
                             horizontal = 16.dp,
-                            vertical = 8.dp)
+                            vertical = 8.dp
+                        )
                         .clip(
-                            RoundedCornerShape(16.dp))
+                            RoundedCornerShape(16.dp)
+                        )
                         .background(color = MaterialTheme.colorScheme.background)
                 ) {
                     Text(text = libro.descripcion)
@@ -158,3 +188,4 @@ fun ContenidoLibro(
         }
     }
 }
+

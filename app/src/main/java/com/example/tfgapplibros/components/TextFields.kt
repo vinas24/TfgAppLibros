@@ -129,7 +129,7 @@ fun CampoSlider(
 
 @Composable
 @Preview
-fun verCampos() {
+fun VerCampos() {
     var usuario by remember { mutableStateOf("") }
     var passwd by remember { mutableStateOf("") }
 

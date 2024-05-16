@@ -19,16 +19,21 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -43,6 +48,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -51,6 +57,7 @@ import com.example.tfgapplibros.AddLibroScreen
 import com.example.tfgapplibros.LibroScreen
 import com.example.tfgapplibros.R
 import com.example.tfgapplibros.components.CartaLibroPerfil
+import com.example.tfgapplibros.components.toColor
 import com.example.tfgapplibros.data.Libro
 import com.example.tfgapplibros.model.PerfilViewModel
 
@@ -66,12 +73,13 @@ fun Perfil(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
+                //TODO: cambiar el titulo dependiendo si es o no es el perfil de nuestro usuario
                 title = { Text("Mi Perfil") },
                 navigationIcon = {
                     IconButton(onClick = {
                         navController.popBackStack()
                     }) {
-                        //TODO: Sustituir por icono flecha atras
+
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = ""
@@ -160,19 +168,22 @@ fun DatosPerfil(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "Mis Gustos:",
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(bottom = 4.dp, top = 12.dp),
-                    fontWeight = FontWeight.Bold
-                )
+                Row (modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
+                    horizontalArrangement = Arrangement.Start){
+                    Text(
+                        text = "Mis Gustos:",
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(bottom = 4.dp, top = 12.dp),
+                        fontWeight = FontWeight.Bold
+                    )
+                }
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(100.dp),
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
                 {
                     items(generos) { gen ->
-                        CajaGenero(nombre = gen)
+                        CajaGenero(nombre = gen, 14.sp)
                     }
                 }
             }
@@ -214,13 +225,14 @@ fun MisLibros(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(color = Color.LightGray)
+                .background(color = MaterialTheme.colorScheme.inversePrimary)
         ) {
-            Text(text = "Mis Libros:", fontSize = 20.sp, modifier = Modifier.padding(12.dp))
+            Text(text = "Mis Libros:", fontSize = 20.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
         }
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 178.dp),
-            modifier = Modifier.padding(4.dp)
+        LazyVerticalStaggeredGrid(
+            columns = StaggeredGridCells.Adaptive(minSize = 178.dp),
+            modifier = Modifier
+                .background(color = Color.White)
         ) {
             items(libros) { libro ->
                 CartaLibroPerfil(libro = libro) {
@@ -262,13 +274,13 @@ fun ImagenRedonda(
 @Composable
 fun CajaGenero(
     nombre: String,
-    modifier: Modifier = Modifier
+    fontsize: TextUnit
 ) {
     Surface(
         modifier = Modifier
             .padding(2.dp),
-        shape = RoundedCornerShape(50),
-        color = Color.DarkGray
+        shape = RoundedCornerShape(25),
+        color = nombre.toColor()
     ) {
         Box(
             modifier = Modifier
@@ -278,48 +290,9 @@ fun CajaGenero(
             Text(
                 text = nombre,
                 color = Color.White,
-                fontSize = 14.sp
+                fontSize = fontsize,
+                fontWeight = FontWeight.Bold
             )
-        }
-    }
-}
-
-@Composable
-fun CajaLibro(
-    nombre: String,
-    image: Painter,
-    modifier: Modifier = Modifier,
-    navController: NavHostController
-
-) {
-    Surface(
-        modifier = Modifier
-            .padding(8.dp),
-        shape = RoundedCornerShape(20),
-        color = Color.LightGray,
-        onClick = {
-            navController.navigate("libro")
-        }
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(4.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painter = image,
-                contentDescription = null,
-                modifier = modifier
-                    .size(200.dp)
-                    .aspectRatio(.85f, matchHeightConstraintsFirst = true)
-                    .padding(2.dp)
-            )
-            Text(
-                text = nombre,
-                color = Color.Black,
-                fontSize = 16.sp
-            )
-
         }
     }
 }
