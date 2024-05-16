@@ -17,12 +17,19 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -31,6 +38,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.example.tfgapplibros.LoginScreen
 import com.example.tfgapplibros.PerfilScreen
 import com.example.tfgapplibros.data.Libro
 import com.example.tfgapplibros.model.Autentificacion
@@ -61,8 +69,26 @@ fun TopBarPrincipal(
                 )
         },
         actions = {
-            IconButton(onClick = {  navController.navigate(PerfilScreen(userId = userId!!))}) {
-                Icon(Icons.Filled.MoreVert, contentDescription = null)
+            var expanded by remember { mutableStateOf(false) }
+            IconButton(
+                onClick = { expanded = true }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = "Menu opciones"
+                )
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text("Mi Perfil") },
+                    onClick = {navController.navigate(PerfilScreen(userId = userId!!))})
+                Divider(modifier = Modifier.padding(horizontal = 8.dp))
+                DropdownMenuItem(
+                    text = { Text("Cerrar Sesion") },
+                    onClick = {Autentificacion.logout { navController.navigate(LoginScreen) }})
             }
         },
         modifier = Modifier

@@ -1,6 +1,7 @@
 package com.example.tfgapplibros.model
 
 import android.net.Uri
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -35,6 +36,10 @@ class AddLibroViewModel : ViewModel() {
     private val _mensOk = MutableLiveData<String?>()
     val mensOk: LiveData<String?> = _mensOk
 
+    private val _loading = mutableStateOf(false)
+    val loading get() = _loading.value
+
+
     fun tituloChange(newTit: String) {
         _titulo.value = newTit
     }
@@ -60,6 +65,7 @@ class AddLibroViewModel : ViewModel() {
     }
 
     fun guardarLibro(userId: String, perfil: () -> Unit) {
+        _loading.value = true
         val titulo = _titulo.value.orEmpty()
         val autor = _autor.value.orEmpty()
         val genero = _genero.value.orEmpty()
@@ -83,9 +89,11 @@ class AddLibroViewModel : ViewModel() {
         libroRepo.guardarLibro(userId, libro, img,
             onSuccess = {
                 _mensOk.value = "Libro anadido"
+                _loading.value = false
                 perfil()
             },
             onFailure = {
+                _loading.value = false
                 _mensError.value = "No se pudo guardar el libro"
             })
 

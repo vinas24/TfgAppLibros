@@ -56,7 +56,7 @@ fun TextoCarta(tit: String, aut: String, genero: String) {
                 fontWeight = MaterialTheme.typography.titleLarge.fontWeight
             )
         ) {
-            append(tit)
+            append(tit.acortarTxt(15))
         }
         withStyle(
             style = SpanStyle(

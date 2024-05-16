@@ -22,7 +22,7 @@ import com.google.firebase.storage.ktx.storage
 import java.lang.reflect.Modifier
 
 @Composable
-fun ImagenConLikeButton(libro: Libro) {
+fun ImagenConLikeButton(libro: Libro, onLike: (Libro) -> Unit) {
     Box(
         modifier = androidx.compose.ui.Modifier
             .fillMaxWidth()
@@ -38,13 +38,13 @@ fun ImagenConLikeButton(libro: Libro) {
                 .aspectRatio(3f / 4f),
         )
         FloatingActionButton(
-            onClick = { /*TODO cambiar el icon a vacio o viceversa y el like en firebase*/ },
+            onClick = { onLike(libro) },
             modifier = androidx.compose.ui.Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),
             shape = CircleShape
         ) {
-            //TODO: cambiar icono por el del corazon
+            //TODO: cambiar icono por el del corazon y que cambie de relleno a vacio
             Icon(
                 imageVector = Icons.Default.Bolt,
                 contentDescription = "Like",
