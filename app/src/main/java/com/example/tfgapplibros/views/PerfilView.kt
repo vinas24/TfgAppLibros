@@ -1,6 +1,5 @@
 package com.example.tfgapplibros.views
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -48,10 +47,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.tfgapplibros.AddLibroScreen
+import com.example.tfgapplibros.LibroScreen
 import com.example.tfgapplibros.R
 import com.example.tfgapplibros.components.CartaLibroPerfil
 import com.example.tfgapplibros.data.Libro
-import com.example.tfgapplibros.model.Autentificacion
 import com.example.tfgapplibros.model.PerfilViewModel
 
 
@@ -60,7 +60,8 @@ val generos = listOf("Ficción", "Fantasía", "Misterio")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Perfil(
-    navController: NavHostController
+    navController: NavHostController,
+    userId: String
 ) {
     Scaffold(
         topBar = {
@@ -80,7 +81,7 @@ fun Perfil(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                navController.navigate("addlibro")
+                navController.navigate(AddLibroScreen(userId = userId))
             }) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -89,7 +90,7 @@ fun Perfil(
             }
         }
     ) {
-        Contenido(it = it, navController = navController);
+        Contenido(it = it, navController = navController, userId = userId);
     }
 }
 
@@ -97,15 +98,13 @@ fun Perfil(
 fun Contenido(
     it: PaddingValues,
     navController: NavHostController,
+    userId: String,
 ) {
-    val userId = Autentificacion.usuarioActualUid
     val viewModel: PerfilViewModel = viewModel()
-
     val libros by viewModel.libros.collectAsState()
-    if (userId != null) {
-        LaunchedEffect(userId) {
-            viewModel.obtenerLibros(userId = userId)
-        }
+
+    LaunchedEffect(userId) {
+        viewModel.obtenerLibros(userId = userId)
     }
     Column(
         modifier = Modifier
@@ -113,7 +112,6 @@ fun Contenido(
             .padding(top = 90.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        //La topbar igual la cambiaré por una apptopbar
         DatosPerfil()
         MisLibros(navController, libros)
     }
@@ -224,10 +222,14 @@ fun MisLibros(
             columns = GridCells.Adaptive(minSize = 178.dp),
             modifier = Modifier.padding(4.dp)
         ) {
-            items(libros) {libro ->
+            items(libros) { libro ->
                 CartaLibroPerfil(libro = libro) {
-                    //TODO: Esto hay que hacxerlo de tal modo que se vea el libro
-                    navController.navigate("libro/${libro.libroId}")
+                    navController.navigate(
+                        LibroScreen(
+                            userId = libro.userId,
+                            libroId = libro.libroId
+                        )
+                    )
                 }
 
             }
@@ -236,6 +238,7 @@ fun MisLibros(
     }
 }
 
+//TODO: Mover la imagen a Images.kt
 @Composable
 fun ImagenRedonda(
     image: Painter,

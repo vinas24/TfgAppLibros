@@ -33,6 +33,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.tfgapplibros.PrincipalScreen
+import com.example.tfgapplibros.RegistroScreen
 import com.example.tfgapplibros.components.CampoContrasena
 import com.example.tfgapplibros.components.CampoTexto
 import com.example.tfgapplibros.model.LoginViewModel
@@ -104,7 +106,7 @@ fun Login(
 
         Text(
             text = "No tienes cuenta todavia?",
-            modifier = Modifier.clickable(onClick = { navController.navigate("Registro") })
+            modifier = Modifier.clickable(onClick = { navController.navigate(RegistroScreen) })
         )
 
         Spacer(
@@ -113,15 +115,15 @@ fun Login(
 
         Button(enabled = camposNoVacios, onClick = {
             viewModel.signInConCorreoContrasena(email = usuario, passwd = passwd) {
-                navController.navigate("Principal")
+                navController.navigate(PrincipalScreen)
             }
             //Reseteamos los campos
             usuario = ""
             passwd = ""
+            //TODO: Estaria bien hacer un spinner de carga
 
-            //Para Probar la app, comentar el If y descomentar la siguente linea
-            //navController.navigate("principal")
         }) {
+            //TODO:This aint working
             errorLogin.value?.let { it1 -> Log.d("mensaje", it1) }
             Text(text = "Entrar")
         }

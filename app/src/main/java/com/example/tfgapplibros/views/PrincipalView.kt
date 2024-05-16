@@ -31,20 +31,24 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.example.tfgapplibros.PerfilScreen
+import com.example.tfgapplibros.model.Autentificacion
 
 @Composable
 fun Principal(
     navController: NavHostController
 ) {
+    val userId = Autentificacion.usuarioActualUid
     Scaffold(
-        topBar = { TopBarPrincipal(navController) }, content = { PaginaPrincipal(it) }
+        topBar = { TopBarPrincipal(navController,userId) }, content = { PaginaPrincipal(it,userId) }
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBarPrincipal(
-    navController: NavHostController
+    navController: NavHostController,
+    userId: String?
 ) {
     TopAppBar(
         title = {
@@ -56,7 +60,7 @@ fun TopBarPrincipal(
                 )
         },
         actions = {
-            IconButton(onClick = {  navController.navigate("perfil")}) {
+            IconButton(onClick = {  navController.navigate(PerfilScreen(userId = userId!!))}) {
                 Icon(Icons.Filled.MoreVert, contentDescription = null)
             }
         },
@@ -72,7 +76,8 @@ fun TopBarPrincipal(
 
 @Composable
 fun PaginaPrincipal(
-    it: PaddingValues
+    it: PaddingValues,
+    userId: String?
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),

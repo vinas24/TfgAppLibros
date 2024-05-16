@@ -48,7 +48,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.privacysandbox.ads.adservices.adid.AdId
 import coil.compose.AsyncImage
+import com.example.tfgapplibros.PerfilScreen
 import com.example.tfgapplibros.R
 import com.example.tfgapplibros.components.CampoSlider
 import com.example.tfgapplibros.components.CampoTexto
@@ -60,6 +62,7 @@ import com.example.tfgapplibros.model.Autentificacion
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddLibro(
+    userId: String,
     navController: NavHostController, viewModel: AddLibroViewModel = viewModel()
 ) {
     Scaffold(
@@ -78,7 +81,12 @@ fun AddLibro(
                 })
         }
     ) {
-        AddLibroContenido(it = it, viewModel = viewModel, navController = navController);
+        AddLibroContenido(
+            it = it,
+            viewModel = viewModel,
+            navController = navController,
+            userId = userId
+        );
     }
 }
 
@@ -87,9 +95,9 @@ fun AddLibro(
 fun AddLibroContenido(
     viewModel: AddLibroViewModel,
     it: PaddingValues,
-    navController: NavHostController
+    navController: NavHostController,
+    userId: String
 ) {
-    val userActivo = Autentificacion.usuarioActualUid
     val listaGeneros = listOf("Ficcion", "Ciencia ficcion", "Fantasia", "Misterio", "Romance")
 
     val titulo by viewModel.titulo.observeAsState("")
@@ -230,10 +238,12 @@ fun AddLibroContenido(
             Button(
                 enabled = camposRellenos,
                 onClick = {
-                    if (userActivo != null) {
-                        viewModel.guardarLibro(userActivo) {
-                            navController.navigate("perfil")
-                        }
+                    viewModel.guardarLibro(userId) {
+                        navController.navigate(
+                            PerfilScreen(
+                                userId = userId
+                            )
+                        )
                     }
                 },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
