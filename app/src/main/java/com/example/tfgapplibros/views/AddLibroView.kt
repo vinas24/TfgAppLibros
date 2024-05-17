@@ -1,15 +1,16 @@
 package com.example.tfgapplibros.views
 
-import android.util.Log
+import android.annotation.SuppressLint
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,22 +23,18 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -56,18 +53,18 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.privacysandbox.ads.adservices.adid.AdId
 import coil.compose.AsyncImage
 import com.example.tfgapplibros.PerfilScreen
 import com.example.tfgapplibros.R
+import com.example.tfgapplibros.components.BotonNormal
 import com.example.tfgapplibros.components.CampoSlider
 import com.example.tfgapplibros.components.CampoTexto
 import com.example.tfgapplibros.components.CampoTextoLargo
 import com.example.tfgapplibros.components.getColorFromResource
 import com.example.tfgapplibros.model.AddLibroViewModel
-import com.example.tfgapplibros.model.Autentificacion
 
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddLibro(
@@ -96,11 +93,10 @@ fun AddLibro(
         }
     ) {
         AddLibroContenido(
-            it = it,
             viewModel = viewModel,
             navController = navController,
             userId = userId
-        );
+        )
     }
 }
 
@@ -108,7 +104,6 @@ fun AddLibro(
 @Composable
 fun AddLibroContenido(
     viewModel: AddLibroViewModel,
-    it: PaddingValues,
     navController: NavHostController,
     userId: String
 ) {
@@ -122,8 +117,8 @@ fun AddLibroContenido(
     //Dropdown
     val generoSeleccionado by viewModel.genero.observeAsState("")
     var expanded by remember { mutableStateOf(false) }
-
     //Imagen
+    //TODO: Cambiar la imagen del placeholder, q ahora mismo es fea
     val placeholderId = R.drawable.ic_launcher_background
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
@@ -133,8 +128,8 @@ fun AddLibroContenido(
         titulo.isNotEmpty() && autor.isNotEmpty() && generoSeleccionado.isNotEmpty() && imageUriSelec != null
 
 
+    //TODO: Poruqe esta no va pero la del login si??
     if (viewModel.loading) {
-        Log.d("fdfe","ssssss")
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -280,10 +275,13 @@ fun AddLibroContenido(
                 onTextChanged = { viewModel.descripcionChange(it) },
                 label = "Mas informacion"
             )
-
-            Button(
-                enabled = camposRellenos,
-                onClick = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                BotonNormal(texto = "Agregar", enabled = camposRellenos) {
                     viewModel.guardarLibro(userId) {
                         navController.navigate(
                             PerfilScreen(
@@ -291,11 +289,7 @@ fun AddLibroContenido(
                             )
                         )
                     }
-                },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            ) {
-
-                Text(text = "Agregar")
+                }
             }
         }
     }

@@ -1,7 +1,6 @@
 package com.example.tfgapplibros.views
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
 
 import androidx.compose.foundation.layout.Arrangement
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -25,7 +23,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -37,12 +34,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.tfgapplibros.PerfilScreen
 import com.example.tfgapplibros.R
 import com.example.tfgapplibros.components.ImagenConLikeButton
 import com.example.tfgapplibros.components.RatingStar
@@ -70,7 +67,7 @@ fun LibroView(
     }
 
     if (libro != null) {
-        ContenidoLibro(libro!!, navController)
+        ContenidoLibro(libro!!, navController, viewModel = viewModel)
     } else {
         //TODO: tocara hacer un mensaje de error o algo
     }
@@ -80,7 +77,8 @@ fun LibroView(
 @Composable
 fun ContenidoLibro(
     libro: Libro,
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: LibroViewModel
 ) {
     Scaffold(
         topBar = {
@@ -116,15 +114,24 @@ fun ContenidoLibro(
                         }
                         DropdownMenu(
                             expanded = expanded,
-                            onDismissRequest = { expanded = false }
+                            onDismissRequest = { expanded = false },
+                            Modifier.background(getColorFromResource(colorResId = R.color.background_dark))
                         ) {
                             DropdownMenuItem(
-                                text = { Text("Modificar") },
-                                onClick = { /*TODO: Metodo que modifica el libro*/ })
+                                text = { Text("Modificar", color = Color.Black) },
+                                onClick = {
+                                    expanded = false
+                                    /*TODO: Metodo que modifica el libro*/
+                                })
                             Divider(modifier = Modifier.padding(horizontal = 8.dp))
                             DropdownMenuItem(
-                                text = { Text("Eliminar") },
-                                onClick = { /*TODO: metodo que elimina el libro*/ })
+                                text = { Text("Eliminar", color = Color.Black) },
+                                onClick = {
+                                    expanded = false
+                                    viewModel.borrarLibro(libro) {
+                                        navController.navigate(PerfilScreen(userId = libro.userId))
+                                    }
+                                })
                         }
                     }
 
@@ -140,6 +147,7 @@ fun ContenidoLibro(
             verticalArrangement = Arrangement.Top,
 
             ) {
+            //TODO: Pasar una accion Para que el action button solo salga si no es nuestro el libro
             ImagenConLikeButton(libro = libro) { /*TODO: Accion de like/Dislike*/ }
             Column(
                 modifier = Modifier.padding(

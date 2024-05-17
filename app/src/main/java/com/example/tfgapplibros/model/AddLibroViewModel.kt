@@ -40,7 +40,6 @@ class AddLibroViewModel : ViewModel() {
     private val _loading = mutableStateOf(false)
     val loading get() = _loading.value
 
-
     fun tituloChange(newTit: String) {
         _titulo.value = newTit
     }

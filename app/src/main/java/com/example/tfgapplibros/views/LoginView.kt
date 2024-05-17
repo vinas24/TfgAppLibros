@@ -1,6 +1,7 @@
 package com.example.tfgapplibros.views
 
 
+import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -11,21 +12,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -42,25 +37,26 @@ import androidx.navigation.NavHostController
 import com.example.tfgapplibros.PrincipalScreen
 import com.example.tfgapplibros.R
 import com.example.tfgapplibros.RegistroScreen
+import com.example.tfgapplibros.components.BotonNormal
 import com.example.tfgapplibros.components.CampoContrasena
 import com.example.tfgapplibros.components.CampoTexto
 import com.example.tfgapplibros.components.getColorFromResource
-import com.example.tfgapplibros.model.Autentificacion
 import com.example.tfgapplibros.model.LoginViewModel
 
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun LoginView(
     navController: NavHostController, viewModel: LoginViewModel = viewModel()
 ) {
     Scaffold {
-        Login(it, navController, viewModel)
+        Login(navController, viewModel)
     }
 }
 
 @Composable
 fun Login(
-    it: PaddingValues, navController: NavHostController, viewModel: LoginViewModel
+    navController: NavHostController, viewModel: LoginViewModel
 ) {
 
     var usuario by remember { mutableStateOf("") }
@@ -77,14 +73,14 @@ fun Login(
     }
 
     if (viewModel.loading) {
-        Log.d("fdfe","ssssss")
+        Log.d("fdfe", "ssssss")
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.Black.copy(alpha = .05f)),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator( color = getColorFromResource(colorResId = R.color.primary))
+            CircularProgressIndicator(color = getColorFromResource(colorResId = R.color.primary))
         }
     }
 
@@ -130,38 +126,20 @@ fun Login(
         Spacer(
             modifier = Modifier.size(16.dp)
         )
-        val colorPrim = getColorFromResource(colorResId = R.color.primary_muted)
-        val colorPrim2 = getColorFromResource(colorResId = R.color.primary_dark)
-        Button(
-            modifier = Modifier,
-            shape = RoundedCornerShape(16.dp),
+        BotonNormal(
+            texto = "Entrar",
             enabled = camposNoVacios && !viewModel.loading,
-            colors = ButtonDefaults.buttonColors(
-                disabledContainerColor = colorPrim,
-                containerColor = colorPrim2
-            ),
-            onClick = {
-                viewModel
-                    .signInConCorreoContrasena(
-                        email = usuario,
-                        passwd = passwd
-                    ) {
-                        navController.navigate(PrincipalScreen)
-                    }
-                usuario = ""
-                passwd = ""
-
-            }) {
-            Text(
-                modifier = Modifier
-                    .padding(
-                        vertical = 6.dp,
-                        horizontal = 24.dp),
-                text = "Entrar",
-                style = MaterialTheme.typography.bodyLarge
-            )
+        ) {
+            viewModel
+                .signInConCorreoContrasena(
+                    email = usuario,
+                    passwd = passwd
+                ) {
+                    navController.navigate(PrincipalScreen)
+                }
+            usuario = ""
+            passwd = ""
         }
-
         Spacer(
             modifier = Modifier.size(48.dp)
         )
