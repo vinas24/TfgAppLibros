@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.tfgapplibros.AddLibroScreen
 import com.example.tfgapplibros.PerfilScreen
 import com.example.tfgapplibros.R
 import com.example.tfgapplibros.components.ImagenConLikeButton
@@ -121,7 +122,7 @@ fun ContenidoLibro(
                                 text = { Text("Modificar", color = Color.Black) },
                                 onClick = {
                                     expanded = false
-                                    /*TODO: Metodo que modifica el libro*/
+                                    navController.navigate(AddLibroScreen(userId = libro.userId, libroId = libro.libroId))
                                 })
                             Divider(modifier = Modifier.padding(horizontal = 8.dp))
                             DropdownMenuItem(

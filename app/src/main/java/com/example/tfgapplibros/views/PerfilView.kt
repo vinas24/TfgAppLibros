@@ -62,6 +62,7 @@ import androidx.navigation.NavHostController
 import coil.size.Size
 import com.example.tfgapplibros.AddLibroScreen
 import com.example.tfgapplibros.LibroScreen
+import com.example.tfgapplibros.PrincipalScreen
 import com.example.tfgapplibros.R
 import com.example.tfgapplibros.components.CartaLibroPerfil
 import com.example.tfgapplibros.components.getColorFromResource
@@ -89,7 +90,7 @@ fun Perfil(
                 ),
                 navigationIcon = {
                     IconButton(onClick = {
-                        navController.popBackStack()
+                        navController.navigate(PrincipalScreen)
                     }) {
 
                         Icon(

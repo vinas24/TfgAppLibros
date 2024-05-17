@@ -1,6 +1,7 @@
 package com.example.tfgapplibros.views
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -37,6 +39,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -69,8 +72,19 @@ import com.example.tfgapplibros.model.AddLibroViewModel
 @Composable
 fun AddLibro(
     userId: String,
-    navController: NavHostController, viewModel: AddLibroViewModel = viewModel()
+    navController: NavHostController,
+    libroId: String? = null,
+    viewModel: AddLibroViewModel = viewModel()
 ) {
+    val esEditando = libroId != null
+
+    Log.d("modifccccc",esEditando.toString())
+    SideEffect {
+        if (esEditando) {
+            viewModel.cargarDetallesLibro(userId,libroId!!)
+        }
+    }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -95,7 +109,9 @@ fun AddLibro(
         AddLibroContenido(
             viewModel = viewModel,
             navController = navController,
-            userId = userId
+            userId = userId,
+            esEditando = esEditando,
+            libroId = libroId
         )
     }
 }
@@ -105,7 +121,9 @@ fun AddLibro(
 fun AddLibroContenido(
     viewModel: AddLibroViewModel,
     navController: NavHostController,
-    userId: String
+    userId: String,
+    esEditando: Boolean,
+    libroId: String?
 ) {
     val listaGeneros = listOf("Ficcion", "Ciencia ficcion", "Fantasia", "Misterio", "Romance")
 
@@ -128,7 +146,7 @@ fun AddLibroContenido(
         titulo.isNotEmpty() && autor.isNotEmpty() && generoSeleccionado.isNotEmpty() && imageUriSelec != null
 
 
-    //TODO: Poruqe esta no va pero la del login si??
+    //TODO: Porq esta no va pero la del login si??
     if (viewModel.loading) {
         Box(
             modifier = Modifier
@@ -143,15 +161,16 @@ fun AddLibroContenido(
 
     Surface(
         color = getColorFromResource(colorResId = R.color.background_light),
-        modifier = Modifier.padding(top = 80.dp)
+        modifier = Modifier.padding(top = 95.dp)
     ) {
         Column(
             modifier = Modifier
-                .padding(vertical = 32.dp, horizontal = 12.dp)
+                .padding(horizontal = 12.dp)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
 
         ) {
+            Spacer(modifier = Modifier.size(12.dp))
             CampoTexto(
                 text = titulo,
                 onTextChanged = { viewModel.tituloChange(it) },
@@ -281,13 +300,26 @@ fun AddLibroContenido(
                     .padding(vertical = 16.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
-                BotonNormal(texto = "Agregar", enabled = camposRellenos) {
-                    viewModel.guardarLibro(userId) {
-                        navController.navigate(
-                            PerfilScreen(
-                                userId = userId
+                if (esEditando) {
+                    BotonNormal(texto = "Editar", enabled = camposRellenos) {
+                        //TODO: Metodo actualizar libro
+                        viewModel.actualizarlibro(userId, libroId!!) {
+                            navController.navigate(
+                                PerfilScreen(
+                                    userId = userId
+                                )
                             )
-                        )
+                        }
+                    }
+                } else {
+                    BotonNormal(texto = "Agregar", enabled = camposRellenos) {
+                        viewModel.guardarLibro(userId) {
+                            navController.navigate(
+                                PerfilScreen(
+                                    userId = userId
+                                )
+                            )
+                        }
                     }
                 }
             }

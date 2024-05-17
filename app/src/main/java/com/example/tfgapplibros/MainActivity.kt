@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.example.tfgapplibros.data.Libro
 import com.example.tfgapplibros.model.Autentificacion
 import com.example.tfgapplibros.ui.theme.TfgAppLibrosTheme
 import com.example.tfgapplibros.views.AddLibro
@@ -52,7 +53,10 @@ class MainActivity : ComponentActivity() {
                     }
                     composable<AddLibroScreen> {
                         val args = it.toRoute<AddLibroScreen>()
-                        AddLibro(userId = args.userId, navController = navController)
+                        AddLibro(
+                            userId = args.userId,
+                            navController = navController,
+                            libroId = args.libroId)
                     }
                     composable<LibroScreen> {
                         val args = it.toRoute<LibroScreen>()
@@ -84,7 +88,8 @@ data class PerfilScreen(
 
 @Serializable
 data class AddLibroScreen(
-    val userId: String
+    val userId: String,
+    val libroId: String? = null
 )
 
 @Serializable

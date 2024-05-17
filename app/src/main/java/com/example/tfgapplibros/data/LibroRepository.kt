@@ -16,7 +16,10 @@ class LibroRepository {
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
-        val libroId = db.collection("usuarios").document(userId).collection("libros").document().id
+        val libroId = db
+            .collection("usuarios")
+            .document(userId).collection("libros")
+            .document().id
         val imgRef = storage.reference.child("libros/$libroId.jpg")
 
         if (imgUri != null) {
@@ -47,6 +50,31 @@ class LibroRepository {
 
     }
 
+    fun actualizarLibro(
+        userId: String,
+        libroId: String,
+        libro: Libro,
+        imgUri: Uri,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val imgRef = storage.reference.child("libros/$libroId.jpg")
+        imgRef.delete()
+            .addOnSuccessListener {
+                //Esta uri esta mal
+                imgRef.putFile(imgUri)
+                    .addOnSuccessListener {
+                        imgRef.downloadUrl.addOnSuccessListener {
+                            val libroActualizado =
+                                libro.copy(imgUrl = it.toString(), libroId = libroId)
+                            guardarLibroDb(userId, libroId, libroActualizado, onSuccess, onFailure)
+                        }.addOnFailureListener { onFailure(it) }
+                    }.addOnFailureListener { onFailure(it) }
+            }.addOnFailureListener { onFailure(it) }
+
+
+    }
+
     suspend fun obtenerLibroPorId(libroId: String, userId: String): Libro? {
         return try {
             val doc = db
@@ -69,7 +97,13 @@ class LibroRepository {
         }
     }
 
-    fun borrarLibro(userId: String, libroId: String, imgUrl: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    fun borrarLibro(
+        userId: String,
+        libroId: String,
+        imgUrl: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
         val libroRef =
             db.collection("usuarios").document(userId).collection("libros").document(libroId)
         val imgRef = storage.getReferenceFromUrl(imgUrl)
@@ -78,7 +112,7 @@ class LibroRepository {
             .addOnSuccessListener {
                 imgRef.delete()
                     .addOnSuccessListener { onSuccess() }
-                    .addOnFailureListener {onFailure(it)}
-            }.addOnFailureListener {onFailure(it)}
+                    .addOnFailureListener { onFailure(it) }
+            }.addOnFailureListener { onFailure(it) }
     }
 }
