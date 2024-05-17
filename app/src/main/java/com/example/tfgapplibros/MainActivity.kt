@@ -22,13 +22,6 @@ import kotlinx.serialization.Serializable
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         FirebaseApp.initializeApp(this)
-        val user = Autentificacion.usuarioActualUid
-
-        var destinoInicial = "login"
-        if (user != null) {
-            destinoInicial = "principal"
-        }
-
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
@@ -36,7 +29,13 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 NavHost(
                     navController = navController,
-                    startDestination = LoginScreen
+                    startDestination =
+                    if (Autentificacion.checkUsuarioGuardado()) {
+                        PrincipalScreen
+                    } else {
+                        LoginScreen
+
+                    }
                 ) {
                     composable<LoginScreen> {
                         LoginView(navController = navController)

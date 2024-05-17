@@ -19,8 +19,10 @@ class LoginViewModel: ViewModel() {
     private val _loading = mutableStateOf(false)
     val loading get() = _loading.value
 
-    private val _loginError = MutableLiveData<String>(null)
-    val loginError: LiveData<String> get() = _loginError
+    private val _loginError = mutableStateOf("")
+    val loginError get() = _loginError.value
+
+
 
     fun signInConCorreoContrasena(email: String, passwd: String, principal: ()-> Unit)
     = viewModelScope.launch {
@@ -33,16 +35,17 @@ class LoginViewModel: ViewModel() {
                         _loading.value = false
                         principal()
                     } else {
-                        _loading.value = false
                         _loginError.value = "Error al iniciar sesion. Comprueba tus credenciales."
+                        _loading.value = false
+
                     }
                 }
         } catch (es: Exception) {
             _loginError.value = "Error al iniciar sesion. Vuelva a intentarlo."
-        } finally {
-            Log.d("loadingggg", _loading.value.toString())
         }
-
     }
 
+    fun resetLoginError() {
+        _loginError.value = ""
+    }
 }

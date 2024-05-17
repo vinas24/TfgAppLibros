@@ -1,5 +1,7 @@
 package com.example.tfgapplibros.views
 
+import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -47,6 +49,9 @@ import com.example.tfgapplibros.model.Autentificacion
 fun Principal(
     navController: NavHostController
 ) {
+    BackHandler {
+        //Esto es para que no se pueda volver para atras
+    }
     val userId = Autentificacion.usuarioActualUid
     Scaffold(
         topBar = { TopBarPrincipal(navController,userId) }, content = { PaginaPrincipal(it,userId) }
@@ -120,7 +125,9 @@ fun PaginaPrincipal(
 @Composable
 fun MyCard(title: String, author: String, image: ImageBitmap?) {
     Card(
-        modifier = Modifier.fillMaxWidth().padding(8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp

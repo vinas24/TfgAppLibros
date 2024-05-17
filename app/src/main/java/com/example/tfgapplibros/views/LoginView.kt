@@ -1,5 +1,6 @@
 package com.example.tfgapplibros.views
 
+
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -15,13 +16,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.currentCompositionLocalContext
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -41,6 +41,7 @@ import com.example.tfgapplibros.PrincipalScreen
 import com.example.tfgapplibros.RegistroScreen
 import com.example.tfgapplibros.components.CampoContrasena
 import com.example.tfgapplibros.components.CampoTexto
+import com.example.tfgapplibros.model.Autentificacion
 import com.example.tfgapplibros.model.LoginViewModel
 
 
@@ -57,10 +58,19 @@ fun LoginView(
 fun Login(
     it: PaddingValues, navController: NavHostController, viewModel: LoginViewModel
 ) {
+
     var usuario by remember { mutableStateOf("") }
     var passwd by remember { mutableStateOf("") }
     val camposNoVacios = usuario.isNotEmpty() && passwd.isNotEmpty()
-    val errorLogin = viewModel.loginError.observeAsState()
+    //For error showcasing
+    val context = LocalContext.current
+
+    LaunchedEffect(viewModel.loginError) {
+        if (viewModel.loginError != "") {
+            Toast.makeText(context, viewModel.loginError, Toast.LENGTH_LONG).show()
+            viewModel.resetLoginError()
+        }
+    }
 
     if (viewModel.loading) {
         Box(
@@ -81,12 +91,7 @@ fun Login(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        //TODO NO esta funcionando ns pq
-//        LaunchedEffect(errorLogin) {
-//            errorLogin.value?.let { message ->
-//                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-//            }
-//        }
+
         Text(
             text = "Iniciar Sesión",
             style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Bold)
@@ -97,7 +102,7 @@ fun Login(
             onTextChanged = { usuario = it },
             label = "Nombre de Usuario",
             keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
+                keyboardType = KeyboardType.Email, imeAction = ImeAction.Next
             ),
         )
 
@@ -110,7 +115,7 @@ fun Login(
             onPasswordChanged = { passwd = it },
             label = "Contrasena",
             keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text, imeAction = ImeAction.Done
+                keyboardType = KeyboardType.Password, imeAction = ImeAction.Done
             ),
         )
 
@@ -129,10 +134,8 @@ fun Login(
                     ) {
                         navController.navigate(PrincipalScreen)
                     }
-                //Reseteamos los campos
                 usuario = ""
                 passwd = ""
-                //TODO: Estaria bien hacer un spinner de carga
 
             }) {
             Text(modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp), text = "Entrar", style = MaterialTheme.typography.bodyLarge)
