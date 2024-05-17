@@ -253,7 +253,7 @@ fun MisLibros(
         Divider(color = Color.Gray)
         Row(
             modifier = Modifier
-                .background(color = getColorFromResource(colorResId = R.color.secondary))
+                .background(color = getColorFromResource(colorResId = R.color.background_dark))
                 .fillMaxWidth()
         ) {
             Text(

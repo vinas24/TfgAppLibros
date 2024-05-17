@@ -7,19 +7,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bolt
-import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.tfgapplibros.R
 import com.example.tfgapplibros.data.Libro
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
-import java.lang.reflect.Modifier
 
 @Composable
 fun ImagenConLikeButton(libro: Libro, onLike: (Libro) -> Unit) {
@@ -42,13 +38,14 @@ fun ImagenConLikeButton(libro: Libro, onLike: (Libro) -> Unit) {
             modifier = androidx.compose.ui.Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),
-            shape = CircleShape
+            shape = CircleShape,
+            containerColor = getColorFromResource(colorResId = R.color.primary_muted)
         ) {
             //TODO: cambiar icono por el del corazon y que cambie de relleno a vacio
             Icon(
                 imageVector = Icons.Default.Bolt,
                 contentDescription = "Like",
-                tint = MaterialTheme.colorScheme.primary
+                tint = getColorFromResource(colorResId = R.color.primary)
             )
         }
 

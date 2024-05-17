@@ -77,13 +77,14 @@ fun Login(
     }
 
     if (viewModel.loading) {
+        Log.d("fdfe","ssssss")
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.Black.copy(alpha = .05f)),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator()
+            CircularProgressIndicator( color = getColorFromResource(colorResId = R.color.primary))
         }
     }
 
@@ -166,7 +167,8 @@ fun Login(
         )
 
         Text(
-            text = "No tienes cuenta todavia?"
+            text = "No tienes cuenta todavia?",
+            color = Color.Black
         )
         Text(
             text = "Registrate",

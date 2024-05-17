@@ -27,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 
 import androidx.compose.runtime.SideEffect
@@ -37,13 +38,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.tfgapplibros.R
 import com.example.tfgapplibros.components.ImagenConLikeButton
 import com.example.tfgapplibros.components.RatingStar
 import com.example.tfgapplibros.components.acortarTxt
+import com.example.tfgapplibros.components.getColorFromResource
 import com.example.tfgapplibros.data.Libro
 import com.example.tfgapplibros.model.Autentificacion
 import com.example.tfgapplibros.model.LibroViewModel
@@ -82,12 +86,17 @@ fun ContenidoLibro(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("Detalles del libro") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = getColorFromResource(colorResId = R.color.primary_dark),
+                    titleContentColor = Color.White
+                ),
                 navigationIcon = {
                     IconButton(onClick = {
                         navController.popBackStack()
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            tint = Color.White,
                             contentDescription = "Volver"
                         )
                     }
@@ -100,7 +109,9 @@ fun ContenidoLibro(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.MoreVert,
+                                tint = Color.White,
                                 contentDescription = "Mas opciones"
+
                             )
                         }
                         DropdownMenu(
@@ -124,7 +135,8 @@ fun ContenidoLibro(
             modifier = Modifier
                 .padding(it)
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .background(color = getColorFromResource(colorResId = R.color.background_light)),
             verticalArrangement = Arrangement.Top,
 
             ) {
@@ -134,7 +146,7 @@ fun ContenidoLibro(
                     horizontal = 16.dp
                 )
             ) {
-                Divider(thickness = 2.dp)
+                Divider(thickness = 2.dp, color = Color.Gray)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -144,6 +156,7 @@ fun ContenidoLibro(
                         modifier = Modifier
                             .padding(vertical = 8.dp),
                         text = libro.titulo.acortarTxt(20),
+                        color = Color.Black,
                         style = MaterialTheme.typography.headlineLarge
                     )
                     CajaGenero(nombre = libro.genero, 14.sp)
@@ -155,26 +168,24 @@ fun ContenidoLibro(
                 ) {
                     Text(
                         text = libro.autor.acortarTxt(20),
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.titleLarge,
+                        color = Color.Black
                     )
                     RatingStar(estado = libro.estado)
 
                 }
-                Surface(
+                Text(
+                    text = libro.descripcion,
+                    color = Color.Black,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
-                        .clip(
-                            RoundedCornerShape(16.dp)
-                        )
-                        .background(color = MaterialTheme.colorScheme.background)
-                ) {
-                    Text(text = libro.descripcion)
-                }
-
+                )
             }
 
         }
+
     }
+
 }
 

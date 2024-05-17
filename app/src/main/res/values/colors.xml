@@ -9,12 +9,12 @@
     <color name="white">#FFFFFFFF</color>
 
 
-    <color name="primary">#4d987b</color>
-    <color name="primary_dark">#3c7660</color>
+    <color name="primary">#3c7660</color>
+    <color name="primary_dark">#2a5343</color>
     <color name="primary_muted">#b1c7bf</color>
     <color name="secondary">#f2cc6c</color>
     <color name="secondary_dark">#eebc3d</color>
-    <color name="background_light">#faf6e2</color>
-    <color name="background">#f8f2d5</color>
-    <color name="background_dark">#f6dc9b</color>
+    <color name="background_light">#f9f9f7</color>
+    <color name="background">#f4f3ef</color>
+    <color name="background_dark">#eae8e0</color>
 </resources>

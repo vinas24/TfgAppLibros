@@ -1,5 +1,6 @@
 package com.example.tfgapplibros.views
 
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -87,6 +88,7 @@ fun AddLibro(
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            tint = Color.White,
                             contentDescription = ""
                         )
                     }
@@ -130,14 +132,16 @@ fun AddLibroContenido(
     val camposRellenos =
         titulo.isNotEmpty() && autor.isNotEmpty() && generoSeleccionado.isNotEmpty() && imageUriSelec != null
 
+
     if (viewModel.loading) {
+        Log.d("fdfe","ssssss")
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.Black.copy(alpha = .05f)),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator()
+            CircularProgressIndicator(color = getColorFromResource(colorResId = R.color.primary))
         }
     }
 
@@ -191,26 +195,27 @@ fun AddLibroContenido(
                     label = { Text("Genero") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     colors = ExposedDropdownMenuDefaults.textFieldColors(
-                            focusedLabelColor = colorPrim2,
-                            focusedIndicatorColor = colorPrim2,
-                            focusedContainerColor = colorBack,
-                            cursorColor = colorPrim2,
-                            unfocusedIndicatorColor = colorPrim,
-                            unfocusedLabelColor = colorPrim,
-                            unfocusedContainerColor = colorBack,
-                            focusedTextColor = colorPrim2,
-                            unfocusedTextColor = colorPrim,
-                            focusedLeadingIconColor = colorPrim2,
-                        ),
-                    )
+                        focusedLabelColor = colorPrim2,
+                        focusedIndicatorColor = colorPrim2,
+                        focusedContainerColor = colorBack,
+                        cursorColor = colorPrim2,
+                        unfocusedIndicatorColor = colorPrim,
+                        unfocusedLabelColor = colorPrim,
+                        unfocusedContainerColor = colorBack,
+                        focusedTextColor = colorPrim2,
+                        unfocusedTextColor = colorPrim,
+                        focusedLeadingIconColor = colorPrim2,
+                    ),
+                )
 
                 ExposedDropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
+                    Modifier.background(getColorFromResource(colorResId = R.color.background_dark))
                 ) {
                     listaGeneros.forEach { selec ->
                         DropdownMenuItem(
-                            text = { Text(selec) },
+                            text = { Text(text = selec, color = Color.Black) },
                             onClick = {
                                 viewModel.generoChange(selec)
                                 expanded = false

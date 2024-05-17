@@ -192,7 +192,11 @@ fun CampoSlider(
 
     val color = getColorFromResource(colorResId = R.color.primary_dark)
     Column() {
-        Text(text = "Estado:  $estadoLibroTexto", modifier = Modifier.padding(horizontal = 60.dp))
+        Text(
+            text = "Estado:  $estadoLibroTexto",
+            modifier = Modifier.padding(horizontal = 60.dp),
+            color = Color.Black
+        )
         Spacer(modifier = Modifier.height(4.dp))
         Slider(
             value = value,
@@ -202,6 +206,7 @@ fun CampoSlider(
             colors = SliderDefaults.colors(
                 thumbColor = color,
                 activeTrackColor = color,
+                inactiveTrackColor = getColorFromResource(colorResId = R.color.primary_muted)
             ),
             modifier = Modifier
                 .fillMaxWidth()

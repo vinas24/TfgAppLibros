@@ -1,16 +1,12 @@
 package com.example.tfgapplibros.components
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
-import androidx.compose.material.icons.filled.StarRate
-import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -18,16 +14,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import com.example.tfgapplibros.R
 import com.example.tfgapplibros.views.CajaGenero
 import kotlin.math.abs
 
@@ -41,7 +35,7 @@ fun RatingStar(
                 imageVector = if (i <= estado) Icons.Default.Star else Icons.Default.StarBorder,
                 contentDescription = "Estado del libro: $estado / 5",
                 modifier = Modifier.size(24.dp),
-                tint = MaterialTheme.colorScheme.primary
+                tint = getColorFromResource(colorResId = R.color.primary)
             )
 
         }
@@ -50,26 +44,27 @@ fun RatingStar(
 
 @Composable
 fun TextoCarta(tit: String, aut: String, genero: String) {
-    val texto = buildAnnotatedString {
-        withStyle(
-            style = SpanStyle(
-                color = MaterialTheme.colorScheme.primary,
-                fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-                fontWeight = MaterialTheme.typography.titleLarge.fontWeight
-            )
-        ) {
-            append(tit.acortarTxt(15))
+        val texto = buildAnnotatedString {
+            withStyle(
+                style = SpanStyle(
+                    color = getColorFromResource(colorResId = R.color.primary),
+                    fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                    fontWeight = MaterialTheme.typography.titleLarge.fontWeight
+                )
+            ) {
+                append(tit.acortarTxt(15))
+            }
+            withStyle(
+                style = SpanStyle(
+                    color = Color.Black,
+                    fontSize = MaterialTheme.typography.labelSmall.fontSize,
+                    fontWeight = MaterialTheme.typography.bodyMedium.fontWeight
+                )
+            ) {
+                append(", ${aut.acortarTxt(15 )}")
+            }
         }
-        withStyle(
-            style = SpanStyle(
-                color = Color.Black,
-                fontSize = MaterialTheme.typography.labelSmall.fontSize,
-                fontWeight = MaterialTheme.typography.bodyMedium.fontWeight
-            )
-        ) {
-            append(", $aut")
-        }
-    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth(),
@@ -78,7 +73,6 @@ fun TextoCarta(tit: String, aut: String, genero: String) {
     ) {
         Text(text = texto)
         CajaGenero(nombre = genero, fontsize = MaterialTheme.typography.labelSmall.fontSize)
-
     }
 }
 
