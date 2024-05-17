@@ -24,6 +24,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -35,6 +36,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -59,6 +62,7 @@ import com.example.tfgapplibros.R
 import com.example.tfgapplibros.components.CampoSlider
 import com.example.tfgapplibros.components.CampoTexto
 import com.example.tfgapplibros.components.CampoTextoLargo
+import com.example.tfgapplibros.components.getColorFromResource
 import com.example.tfgapplibros.model.AddLibroViewModel
 import com.example.tfgapplibros.model.Autentificacion
 
@@ -73,6 +77,10 @@ fun AddLibro(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("Nuevo Libro") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = getColorFromResource(colorResId = R.color.primary_dark),
+                    titleContentColor = Color.White
+                ),
                 navigationIcon = {
                     IconButton(onClick = {
                         navController.popBackStack()
@@ -112,6 +120,7 @@ fun AddLibroContenido(
     //Dropdown
     val generoSeleccionado by viewModel.genero.observeAsState("")
     var expanded by remember { mutableStateOf(false) }
+
     //Imagen
     val placeholderId = R.drawable.ic_launcher_background
     val photoPickerLauncher = rememberLauncherForActivityResult(
@@ -134,12 +143,12 @@ fun AddLibroContenido(
 
 
     Surface(
-        color = MaterialTheme.colorScheme.background,
-        modifier = Modifier.padding(top = 100.dp)
+        color = getColorFromResource(colorResId = R.color.background_light),
+        modifier = Modifier.padding(top = 80.dp)
     ) {
         Column(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(vertical = 32.dp, horizontal = 12.dp)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
 
@@ -170,6 +179,10 @@ fun AddLibroContenido(
                 onExpandedChange = { expanded = it },
                 modifier = Modifier.padding(horizontal = 30.dp)
             ) {
+                val colorPrim = getColorFromResource(colorResId = R.color.primary)
+                val colorPrim2 = getColorFromResource(colorResId = R.color.primary_dark)
+                val colorBack = getColorFromResource(colorResId = R.color.background_light)
+
                 OutlinedTextField(
                     modifier = Modifier.menuAnchor(),
                     readOnly = true,
@@ -177,8 +190,20 @@ fun AddLibroContenido(
                     onValueChange = { viewModel.generoChange(it) },
                     label = { Text("Genero") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                )
+                    colors = ExposedDropdownMenuDefaults.textFieldColors(
+                            focusedLabelColor = colorPrim2,
+                            focusedIndicatorColor = colorPrim2,
+                            focusedContainerColor = colorBack,
+                            cursorColor = colorPrim2,
+                            unfocusedIndicatorColor = colorPrim,
+                            unfocusedLabelColor = colorPrim,
+                            unfocusedContainerColor = colorBack,
+                            focusedTextColor = colorPrim2,
+                            unfocusedTextColor = colorPrim,
+                            focusedLeadingIconColor = colorPrim2,
+                        ),
+                    )
+
                 ExposedDropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },

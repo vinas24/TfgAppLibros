@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -38,9 +40,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.tfgapplibros.PrincipalScreen
+import com.example.tfgapplibros.R
 import com.example.tfgapplibros.RegistroScreen
 import com.example.tfgapplibros.components.CampoContrasena
 import com.example.tfgapplibros.components.CampoTexto
+import com.example.tfgapplibros.components.getColorFromResource
 import com.example.tfgapplibros.model.Autentificacion
 import com.example.tfgapplibros.model.LoginViewModel
 
@@ -85,16 +89,18 @@ fun Login(
 
     Column(
         modifier = Modifier
-            .padding(it)
-            .padding(top = 30.dp)
-            .fillMaxSize(),
+            .fillMaxSize()
+            .background(getColorFromResource(colorResId = R.color.background_light)),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
 
         Text(
-            text = "Iniciar Sesión",
-            style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Bold)
+            text = "INICIAR SESION",
+            style = MaterialTheme.typography.displaySmall.copy(
+                fontWeight = FontWeight.Bold,
+                color = getColorFromResource(colorResId = R.color.primary)
+            )
         )
         Spacer(modifier = Modifier.size(8.dp))
         CampoTexto(
@@ -123,9 +129,16 @@ fun Login(
         Spacer(
             modifier = Modifier.size(16.dp)
         )
-
+        val colorPrim = getColorFromResource(colorResId = R.color.primary_muted)
+        val colorPrim2 = getColorFromResource(colorResId = R.color.primary_dark)
         Button(
+            modifier = Modifier,
+            shape = RoundedCornerShape(16.dp),
             enabled = camposNoVacios && !viewModel.loading,
+            colors = ButtonDefaults.buttonColors(
+                disabledContainerColor = colorPrim,
+                containerColor = colorPrim2
+            ),
             onClick = {
                 viewModel
                     .signInConCorreoContrasena(
@@ -138,16 +151,30 @@ fun Login(
                 passwd = ""
 
             }) {
-            Text(modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp), text = "Entrar", style = MaterialTheme.typography.bodyLarge)
+            Text(
+                modifier = Modifier
+                    .padding(
+                        vertical = 6.dp,
+                        horizontal = 24.dp),
+                text = "Entrar",
+                style = MaterialTheme.typography.bodyLarge
+            )
         }
 
         Spacer(
-            modifier = Modifier.size(64.dp)
+            modifier = Modifier.size(48.dp)
         )
 
         Text(
-            text = "No tienes cuenta todavia?",
-            modifier = Modifier.clickable(onClick = { navController.navigate(RegistroScreen) })
+            text = "No tienes cuenta todavia?"
+        )
+        Text(
+            text = "Registrate",
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .clickable(
+                    onClick = { navController.navigate(RegistroScreen) }),
+            color = getColorFromResource(colorResId = R.color.primary)
         )
     }
 }

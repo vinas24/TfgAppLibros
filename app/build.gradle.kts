@@ -87,6 +87,8 @@ dependencies {
     implementation(libs.firebase.firestore)
     //New navigation needs this serializable
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.ui.text.google.fonts)
+
 
 
 
