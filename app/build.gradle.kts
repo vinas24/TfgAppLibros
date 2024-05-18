@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -84,6 +85,10 @@ dependencies {
     // Add the dependencies for any other Firebase products you want to use
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+    //New navigation needs this serializable
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.ui.text.google.fonts)
+
 
 
 

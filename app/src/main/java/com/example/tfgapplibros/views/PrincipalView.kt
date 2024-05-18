@@ -1,15 +1,22 @@
 package com.example.tfgapplibros.views
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -17,12 +24,19 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -31,20 +45,30 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.example.tfgapplibros.LoginScreen
+import com.example.tfgapplibros.PerfilScreen
+import com.example.tfgapplibros.R
+import com.example.tfgapplibros.components.getColorFromResource
+import com.example.tfgapplibros.model.Autentificacion
 
 @Composable
 fun Principal(
     navController: NavHostController
 ) {
+    BackHandler {
+        //Esto es para que no se pueda volver para atras
+    }
+    val userId = Autentificacion.usuarioActualUid
     Scaffold(
-        topBar = { TopBarPrincipal(navController) }, content = { PaginaPrincipal(it) }
+        topBar = { TopBarPrincipal(navController,userId) }, content = { PaginaPrincipal(it,userId) }
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBarPrincipal(
-    navController: NavHostController
+    navController: NavHostController,
+    userId: String?
 ) {
     TopAppBar(
         title = {
@@ -56,8 +80,31 @@ fun TopBarPrincipal(
                 )
         },
         actions = {
-            IconButton(onClick = {  navController.navigate("perfil")}) {
-                Icon(Icons.Filled.MoreVert, contentDescription = null)
+            var expanded by remember { mutableStateOf(false) }
+            IconButton(
+                onClick = { expanded = true }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = "Menu opciones"
+                )
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                Modifier.background(getColorFromResource(colorResId = R.color.background_dark))
+            ) {
+                DropdownMenuItem(
+                    text = { Text("Mi Perfil", color = Color.Black)},
+                    onClick = {
+                        expanded = false;
+                        navController.navigate(PerfilScreen(userId = userId!!))})
+                Divider(modifier = Modifier.padding(horizontal = 8.dp))
+                DropdownMenuItem(
+                    text = { Text("Cerrar Sesion", color = Color.Black) },
+                    onClick = {
+                        expanded = false;
+                        Autentificacion.logout { navController.navigate(LoginScreen) }})
             }
         },
         modifier = Modifier
@@ -72,7 +119,8 @@ fun TopBarPrincipal(
 
 @Composable
 fun PaginaPrincipal(
-    it: PaddingValues
+    it: PaddingValues,
+    userId: String?
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -88,7 +136,9 @@ fun PaginaPrincipal(
 @Composable
 fun MyCard(title: String, author: String, image: ImageBitmap?) {
     Card(
-        modifier = Modifier.fillMaxWidth().padding(8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -141,3 +191,4 @@ fun MyCard(title: String, author: String, image: ImageBitmap?) {
         }
     }
 }
+

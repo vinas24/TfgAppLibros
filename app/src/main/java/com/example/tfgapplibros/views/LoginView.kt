@@ -1,31 +1,32 @@
 package com.example.tfgapplibros.views
 
+
+import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.currentCompositionLocalContext
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -33,55 +34,78 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.tfgapplibros.PrincipalScreen
+import com.example.tfgapplibros.R
+import com.example.tfgapplibros.RegistroScreen
+import com.example.tfgapplibros.components.BotonNormal
 import com.example.tfgapplibros.components.CampoContrasena
 import com.example.tfgapplibros.components.CampoTexto
+import com.example.tfgapplibros.components.getColorFromResource
 import com.example.tfgapplibros.model.LoginViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun LoginView(
     navController: NavHostController, viewModel: LoginViewModel = viewModel()
 ) {
     Scaffold {
-        Login(it, navController, viewModel)
+        Login(navController, viewModel)
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Login(
-    it: PaddingValues, navController: NavHostController, viewModel: LoginViewModel
+    navController: NavHostController, viewModel: LoginViewModel
 ) {
-    var context = LocalContext.current
+
     var usuario by remember { mutableStateOf("") }
     var passwd by remember { mutableStateOf("") }
     val camposNoVacios = usuario.isNotEmpty() && passwd.isNotEmpty()
-    val errorLogin = viewModel.loginError.observeAsState()
+    //For error showcasing
+    val context = LocalContext.current
+
+    LaunchedEffect(viewModel.loginError) {
+        if (viewModel.loginError != "") {
+            Toast.makeText(context, viewModel.loginError, Toast.LENGTH_LONG).show()
+            viewModel.resetLoginError()
+        }
+    }
+
+    if (viewModel.loading) {
+        Log.d("fdfe", "ssssss")
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = .05f)),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(color = getColorFromResource(colorResId = R.color.primary))
+        }
+    }
 
     Column(
         modifier = Modifier
-            .padding(it)
-            .padding(top = 30.dp)
-            .fillMaxSize(),
+            .fillMaxSize()
+            .background(getColorFromResource(colorResId = R.color.background_light)),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
-        //TODO NO esta funcionando ns pq
-//        LaunchedEffect(errorLogin) {
-//            errorLogin.value?.let { message ->
-//                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-//            }
-//        }
+
         Text(
-            text = "Iniciar Sesión",
-            style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Bold)
+            text = "INICIAR SESION",
+            style = MaterialTheme.typography.displaySmall.copy(
+                fontWeight = FontWeight.Bold,
+                color = getColorFromResource(colorResId = R.color.primary)
+            )
         )
+        Spacer(modifier = Modifier.size(8.dp))
         CampoTexto(
             text = usuario,
             onTextChanged = { usuario = it },
             label = "Nombre de Usuario",
             keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
+                keyboardType = KeyboardType.Email, imeAction = ImeAction.Next
             ),
         )
 
@@ -94,37 +118,43 @@ fun Login(
             onPasswordChanged = { passwd = it },
             label = "Contrasena",
             keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text, imeAction = ImeAction.Done
+                keyboardType = KeyboardType.Password, imeAction = ImeAction.Done
             ),
         )
+
 
         Spacer(
             modifier = Modifier.size(16.dp)
         )
+        BotonNormal(
+            texto = "Entrar",
+            enabled = camposNoVacios && !viewModel.loading,
+        ) {
+            viewModel
+                .signInConCorreoContrasena(
+                    email = usuario,
+                    passwd = passwd
+                ) {
+                    navController.navigate(PrincipalScreen)
+                }
+            usuario = ""
+            passwd = ""
+        }
+        Spacer(
+            modifier = Modifier.size(48.dp)
+        )
 
         Text(
             text = "No tienes cuenta todavia?",
-            modifier = Modifier.clickable(onClick = { navController.navigate("Registro") })
+            color = Color.Black
         )
-
-        Spacer(
-            modifier = Modifier.size(8.dp)
+        Text(
+            text = "Registrate",
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .clickable(
+                    onClick = { navController.navigate(RegistroScreen) }),
+            color = getColorFromResource(colorResId = R.color.primary)
         )
-
-        Button(enabled = camposNoVacios, onClick = {
-            viewModel.signInConCorreoContrasena(email = usuario, passwd = passwd) {
-                navController.navigate("Principal")
-            }
-            //Reseteamos los campos
-            usuario = ""
-            passwd = ""
-
-            //Para Probar la app, comentar el If y descomentar la siguente linea
-            //navController.navigate("principal")
-        }) {
-            errorLogin.value?.let { it1 -> Log.d("mensaje", it1) }
-            Text(text = "Entrar")
-        }
-
     }
 }

@@ -1,6 +1,5 @@
 package com.example.tfgapplibros.views
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,19 +19,29 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,17 +50,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import coil.size.Size
+import com.example.tfgapplibros.AddLibroScreen
+import com.example.tfgapplibros.LibroScreen
+import com.example.tfgapplibros.PrincipalScreen
 import com.example.tfgapplibros.R
 import com.example.tfgapplibros.components.CartaLibroPerfil
+import com.example.tfgapplibros.components.getColorFromResource
+import com.example.tfgapplibros.components.toColor
 import com.example.tfgapplibros.data.Libro
-import com.example.tfgapplibros.model.Autentificacion
 import com.example.tfgapplibros.model.PerfilViewModel
 
 
@@ -60,36 +76,51 @@ val generos = listOf("Ficción", "Fantasía", "Misterio")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Perfil(
-    navController: NavHostController
+    navController: NavHostController,
+    userId: String
 ) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
+                //TODO: cambiar el titulo dependiendo si es o no es el perfil de nuestro usuario
                 title = { Text("Mi Perfil") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = getColorFromResource(colorResId = R.color.primary_dark),
+                    titleContentColor = Color.White
+                ),
                 navigationIcon = {
                     IconButton(onClick = {
-                        navController.popBackStack()
+                        navController.navigate(PrincipalScreen)
                     }) {
-                        //TODO: Sustituir por icono flecha atras
+
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = ""
+                            contentDescription = "",
+                            tint = Color.White
                         )
                     }
                 })
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                navController.navigate("addlibro")
-            }) {
+            FloatingActionButton(
+                onClick = {
+                    navController.navigate(AddLibroScreen(userId = userId))
+                },
+                containerColor = getColorFromResource(colorResId = R.color.primary),
+                shape = CircleShape
+            ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Add libro"
+                    contentDescription = "Add libro",
+                    tint = Color.White,
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .size(32.dp)
                 )
             }
         }
     ) {
-        Contenido(it = it, navController = navController);
+        Contenido(it = it, navController = navController, userId = userId);
     }
 }
 
@@ -97,23 +128,21 @@ fun Perfil(
 fun Contenido(
     it: PaddingValues,
     navController: NavHostController,
+    userId: String,
 ) {
-    val userId = Autentificacion.usuarioActualUid
     val viewModel: PerfilViewModel = viewModel()
-
     val libros by viewModel.libros.collectAsState()
-    if (userId != null) {
-        LaunchedEffect(userId) {
-            viewModel.obtenerLibros(userId = userId)
-        }
+
+    LaunchedEffect(userId) {
+        viewModel.obtenerLibros(userId = userId)
     }
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 90.dp),
+            .padding(top = 95.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        //La topbar igual la cambiaré por una apptopbar
+        Divider(thickness = 2.dp, color = Color.Gray)
         DatosPerfil()
         MisLibros(navController, libros)
     }
@@ -127,7 +156,7 @@ fun DatosPerfil(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxWidth()
-            .background(color = Color.Gray)
+            .background(color = getColorFromResource(colorResId = R.color.primary))
             .padding(vertical = 12.dp)
     ) {
         Row(
@@ -162,19 +191,27 @@ fun DatosPerfil(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "Mis Gustos:",
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(bottom = 4.dp, top = 12.dp),
-                    fontWeight = FontWeight.Bold
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 32.dp),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Text(
+                        text = "Mis Gustos:",
+                        color = getColorFromResource(colorResId = R.color.background_dark),
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(bottom = 4.dp, top = 12.dp),
+                        fontWeight = FontWeight.Bold
+                    )
+                }
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(100.dp),
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
                 {
                     items(generos) { gen ->
-                        CajaGenero(nombre = gen)
+                        CajaGenero(nombre = gen, 14.sp)
                     }
                 }
             }
@@ -192,13 +229,14 @@ fun Biografia(
         verticalArrangement = Arrangement.SpaceAround,
         modifier = modifier
     ) {
-        Text(text = "Nombre de Usuario", fontSize = 20.sp)
-        Text(text = "Ciudad, Pais", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Text(text = "Nombre de Usuario", fontSize = 20.sp, color = getColorFromResource(colorResId = R.color.background_dark), fontWeight = FontWeight.Bold)
+        Text(text = "Ciudad, Pais", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = "Una breve descripcion de uno mismo, con que libros le gusta leer y poco más.",
             fontSize = 16.sp,
-            lineHeight = 18.sp
+            lineHeight = 18.sp,
+            color = Color.White
         )
 
     }
@@ -213,21 +251,34 @@ fun MisLibros(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.Start
     ) {
+        Divider(color = Color.Gray)
         Row(
             modifier = Modifier
+                .background(color = getColorFromResource(colorResId = R.color.background_dark))
                 .fillMaxWidth()
-                .background(color = Color.LightGray)
         ) {
-            Text(text = "Mis Libros:", fontSize = 20.sp, modifier = Modifier.padding(12.dp))
+            Text(
+                text = "Mis Libros:",
+                fontSize = 20.sp,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            )
         }
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 178.dp),
-            modifier = Modifier.padding(4.dp)
+        Divider(color = Color.Gray)
+
+        LazyVerticalStaggeredGrid(
+            columns = StaggeredGridCells.Adaptive(minSize = 178.dp),
+            modifier = Modifier
+                .background(color = getColorFromResource(colorResId = R.color.background_light))
+                .fillMaxSize()
         ) {
-            items(libros) {libro ->
+            items(libros) { libro ->
                 CartaLibroPerfil(libro = libro) {
-                    //TODO: Esto hay que hacxerlo de tal modo que se vea el libro
-                    navController.navigate("libro")
+                    navController.navigate(
+                        LibroScreen(
+                            userId = libro.userId,
+                            libroId = libro.libroId
+                        )
+                    )
                 }
 
             }
@@ -236,6 +287,7 @@ fun MisLibros(
     }
 }
 
+//TODO: Mover la imagen a Images.kt
 @Composable
 fun ImagenRedonda(
     image: Painter,
@@ -259,13 +311,13 @@ fun ImagenRedonda(
 @Composable
 fun CajaGenero(
     nombre: String,
-    modifier: Modifier = Modifier
+    fontsize: TextUnit
 ) {
     Surface(
         modifier = Modifier
             .padding(2.dp),
-        shape = RoundedCornerShape(50),
-        color = Color.DarkGray
+        shape = RoundedCornerShape(25),
+        color = nombre.toColor()
     ) {
         Box(
             modifier = Modifier
@@ -275,48 +327,9 @@ fun CajaGenero(
             Text(
                 text = nombre,
                 color = Color.White,
-                fontSize = 14.sp
+                fontSize = fontsize,
+                fontWeight = FontWeight.Bold
             )
-        }
-    }
-}
-
-@Composable
-fun CajaLibro(
-    nombre: String,
-    image: Painter,
-    modifier: Modifier = Modifier,
-    navController: NavHostController
-
-) {
-    Surface(
-        modifier = Modifier
-            .padding(8.dp),
-        shape = RoundedCornerShape(20),
-        color = Color.LightGray,
-        onClick = {
-            navController.navigate("libro")
-        }
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(4.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painter = image,
-                contentDescription = null,
-                modifier = modifier
-                    .size(200.dp)
-                    .aspectRatio(.85f, matchHeightConstraintsFirst = true)
-                    .padding(2.dp)
-            )
-            Text(
-                text = nombre,
-                color = Color.Black,
-                fontSize = 16.sp
-            )
-
         }
     }
 }

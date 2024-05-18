@@ -10,12 +10,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text2.input.TextFieldLineLimits
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,15 +27,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.autofill.AutofillType
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.Typeface
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.tfgapplibros.R
 
 @Composable
 
@@ -42,17 +46,42 @@ fun CampoTexto(
     keyboardOptions: KeyboardOptions,
     modifier: Modifier = Modifier
 ) {
-    OutlinedTextField(
-        value = text,
-        onValueChange = { onTextChanged(it) },
-        label = { Text(label) },
-        maxLines = 1,
-        shape = MaterialTheme.shapes.small,
-        keyboardOptions = keyboardOptions,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 30.dp)
+    val colorPrim = getColorFromResource(colorResId = R.color.primary)
+    val colorPrim2 = getColorFromResource(colorResId = R.color.primary_dark)
+    val colorBack = getColorFromResource(colorResId = R.color.background_light)
+
+    val customTextSelectionColors = TextSelectionColors(
+        handleColor = colorPrim2,
+        backgroundColor = colorPrim2
     )
+    CompositionLocalProvider(
+        LocalTextSelectionColors provides customTextSelectionColors
+    ) {
+        OutlinedTextField(
+            value = text,
+            onValueChange = { onTextChanged(it) },
+            label = { Text(label) },
+            maxLines = 1,
+            shape = MaterialTheme.shapes.small,
+            keyboardOptions = keyboardOptions,
+            colors = TextFieldDefaults.colors(
+                focusedLabelColor = colorPrim2,
+                focusedIndicatorColor = colorPrim2,
+                focusedContainerColor = colorBack,
+                cursorColor = colorPrim2,
+                unfocusedIndicatorColor = colorPrim,
+                unfocusedLabelColor = colorPrim,
+                unfocusedContainerColor = colorBack,
+                focusedTextColor = colorPrim2,
+                unfocusedTextColor = colorPrim,
+                focusedLeadingIconColor = colorPrim2,
+            ),
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 30.dp)
+        )
+    }
+
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -63,22 +92,46 @@ fun CampoTextoLargo(
     label: String,
     modifier: Modifier = Modifier
 ) {
-    OutlinedTextField(
-        value = text,
-        onValueChange = { onTextChanged(it) },
-        label = { Text(label) },
-        shape = MaterialTheme.shapes.small,
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Text,
-            imeAction = ImeAction.Default,
+    val colorPrim = getColorFromResource(colorResId = R.color.primary)
+    val colorPrim2 = getColorFromResource(colorResId = R.color.primary_dark)
+    val colorBack = getColorFromResource(colorResId = R.color.background_light)
 
+    val customTextSelectionColors = TextSelectionColors(
+        handleColor = colorPrim2,
+        backgroundColor = colorPrim2
+    )
+    CompositionLocalProvider(
+        LocalTextSelectionColors provides customTextSelectionColors
+    ) {
+        OutlinedTextField(
+            value = text,
+            onValueChange = { onTextChanged(it) },
+            label = { Text(label) },
+            shape = MaterialTheme.shapes.small,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Default,
             ),
-        modifier = modifier
-            .fillMaxWidth()
-            .height(250.dp)
-            .padding(horizontal = 30.dp),
+            colors = TextFieldDefaults.colors(
+                focusedLabelColor = colorPrim2,
+                focusedIndicatorColor = colorPrim2,
+                focusedContainerColor = colorBack,
+                cursorColor = colorPrim2,
+                unfocusedIndicatorColor = colorPrim,
+                unfocusedLabelColor = colorPrim,
+                unfocusedContainerColor = colorBack,
+                focusedTextColor = colorPrim2,
+                unfocusedTextColor = colorPrim,
+                focusedLeadingIconColor = colorPrim2,
 
-        )
+                ),
+            modifier = modifier
+                .fillMaxWidth()
+                .height(250.dp)
+                .padding(horizontal = 30.dp),
+
+            )
+    }
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -90,17 +143,42 @@ fun CampoContrasena(
     modifier: Modifier = Modifier,
     keyboardOptions: KeyboardOptions
 ) {
-    OutlinedTextField(
-        value = password,
-        onValueChange = { onPasswordChanged(it) },
-        label = { Text(label) },
-        shape = MaterialTheme.shapes.small,
-        visualTransformation = PasswordVisualTransformation(),
-        keyboardOptions = keyboardOptions,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 30.dp)
+    val colorPrim = getColorFromResource(colorResId = R.color.primary)
+    val colorPrim2 = getColorFromResource(colorResId = R.color.primary_dark)
+    val colorBack = getColorFromResource(colorResId = R.color.background_light)
+
+    val customTextSelectionColors = TextSelectionColors(
+        handleColor = colorPrim2,
+        backgroundColor = colorPrim2
     )
+    CompositionLocalProvider(
+        LocalTextSelectionColors provides customTextSelectionColors
+    ) {
+        OutlinedTextField(
+            value = password,
+            onValueChange = { onPasswordChanged(it) },
+            label = { Text(label) },
+            shape = MaterialTheme.shapes.small,
+            colors = TextFieldDefaults.colors(
+                focusedLabelColor = colorPrim2,
+                focusedIndicatorColor = colorPrim2,
+                focusedContainerColor = colorBack,
+                cursorColor = colorPrim2,
+                unfocusedIndicatorColor = colorPrim,
+                unfocusedLabelColor = colorPrim,
+                unfocusedContainerColor = colorBack,
+                focusedTextColor = colorPrim2,
+                unfocusedTextColor = colorPrim,
+                focusedLeadingIconColor = colorPrim2,
+
+                ),
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = keyboardOptions,
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 30.dp)
+        )
+    }
 }
 
 @Composable
@@ -112,14 +190,24 @@ fun CampoSlider(
         listOf("Mucho uso", "Uso Moderado", "Poco Uso", "Como nuevo", "Nuevo")
     var estadoLibroTexto = listaEstados[(value - 1).toInt()]
 
+    val color = getColorFromResource(colorResId = R.color.primary_dark)
     Column() {
-        Text(text = "Estado:  $estadoLibroTexto", modifier = Modifier.padding(horizontal = 60.dp))
+        Text(
+            text = "Estado:  $estadoLibroTexto",
+            modifier = Modifier.padding(horizontal = 60.dp),
+            color = Color.Black
+        )
         Spacer(modifier = Modifier.height(4.dp))
         Slider(
             value = value,
             onValueChange = onValueChange,
             valueRange = 1f..5f,
             steps = 3,
+            colors = SliderDefaults.colors(
+                thumbColor = color,
+                activeTrackColor = color,
+                inactiveTrackColor = getColorFromResource(colorResId = R.color.primary_muted)
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 40.dp)
@@ -130,7 +218,7 @@ fun CampoSlider(
 
 @Composable
 @Preview
-fun verCampos() {
+fun VerCampos() {
     var usuario by remember { mutableStateOf("") }
     var passwd by remember { mutableStateOf("") }
 
@@ -163,5 +251,6 @@ fun verCampos() {
         )
     }
 }
+
 
 

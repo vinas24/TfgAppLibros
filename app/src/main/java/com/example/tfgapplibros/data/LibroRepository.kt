@@ -1,12 +1,9 @@
 package com.example.tfgapplibros.data
 
 import android.net.Uri
-import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
-import okhttp3.internal.wait
-import kotlin.math.log
 
 class LibroRepository {
     private val db = FirebaseFirestore.getInstance()
@@ -19,14 +16,17 @@ class LibroRepository {
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
-        val libroId = db.collection("usuarios").document(userId).collection("libros").document().id
+        val libroId = db
+            .collection("usuarios")
+            .document(userId).collection("libros")
+            .document().id
         val imgRef = storage.reference.child("libros/$libroId.jpg")
 
         if (imgUri != null) {
             imgRef.putFile(imgUri)
                 .addOnSuccessListener {
                     imgRef.downloadUrl.addOnSuccessListener {
-                        val libroActualizado = libro.copy(imgUrl = it.toString())
+                        val libroActualizado = libro.copy(imgUrl = it.toString(), libroId = libroId)
                         guardarLibroDb(userId, libroId, libroActualizado, onSuccess, onFailure)
                     }.addOnFailureListener { onFailure(it) }
                 }.addOnFailureListener { onFailure(it) }
@@ -50,25 +50,69 @@ class LibroRepository {
 
     }
 
-    suspend fun librosDelUsuario(userId: String): List<Libro> {
-        val libros = mutableListOf<Libro>()
-        try {
-            val snapshot = db
+    fun actualizarLibro(
+        userId: String,
+        libroId: String,
+        libro: Libro,
+        imgUri: Uri,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val imgRef = storage.reference.child("libros/$libroId.jpg")
+        imgRef.delete()
+            .addOnSuccessListener {
+                //Esta uri esta mal
+                imgRef.putFile(imgUri)
+                    .addOnSuccessListener {
+                        imgRef.downloadUrl.addOnSuccessListener {
+                            val libroActualizado =
+                                libro.copy(imgUrl = it.toString(), libroId = libroId)
+                            guardarLibroDb(userId, libroId, libroActualizado, onSuccess, onFailure)
+                        }.addOnFailureListener { onFailure(it) }
+                    }.addOnFailureListener { onFailure(it) }
+            }.addOnFailureListener { onFailure(it) }
+
+
+    }
+
+    suspend fun obtenerLibroPorId(libroId: String, userId: String): Libro? {
+        return try {
+            val doc = db
                 .collection("usuarios")
                 .document(userId)
                 .collection("libros")
+                .document(libroId)
                 .get()
                 .await()
-            for (doc in snapshot.documents) {
+            if (doc.exists()) {
                 val libro = doc.toObject(Libro::class.java)
-                libro?.let { libros.add(libro) }
 
+                libro
+            } else {
+                null
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            null
         }
-        return libros
     }
 
+    fun borrarLibro(
+        userId: String,
+        libroId: String,
+        imgUrl: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val libroRef =
+            db.collection("usuarios").document(userId).collection("libros").document(libroId)
+        val imgRef = storage.getReferenceFromUrl(imgUrl)
 
+        libroRef.delete()
+            .addOnSuccessListener {
+                imgRef.delete()
+                    .addOnSuccessListener { onSuccess() }
+                    .addOnFailureListener { onFailure(it) }
+            }.addOnFailureListener { onFailure(it) }
+    }
 }
