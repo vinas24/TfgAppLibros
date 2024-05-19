@@ -1,6 +1,4 @@
 package com.example.tfgapplibros.views
-
-
 import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
@@ -9,7 +7,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
@@ -42,8 +39,6 @@ import com.example.tfgapplibros.components.CampoContrasena
 import com.example.tfgapplibros.components.CampoTexto
 import com.example.tfgapplibros.components.getColorFromResource
 import com.example.tfgapplibros.model.LoginViewModel
-
-
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun LoginView(

@@ -1,18 +1,15 @@
 package com.example.tfgapplibros.views
-
-import android.net.Uri
 import android.widget.ImageView
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -32,10 +29,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.tfgapplibros.R
+import com.example.tfgapplibros.RegistroScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,13 +55,14 @@ fun RegisterView(
                 })
         }
     ) {
-        RegistrarUsuarioView(it)
+        RegistrarUsuarioView(navController,it)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegistrarUsuarioView(
+    navController: NavHostController,
     it: PaddingValues
 ) {
     lateinit var imView: ImageView
@@ -107,6 +105,7 @@ fun RegistrarUsuarioView(
                 .padding(horizontal = 30.dp)
                 .padding(bottom = 15.dp)
         )
+        Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = apellidos, onValueChange = { apellidos = it },
             label = { Text(text = "Apellidos") },
@@ -115,6 +114,7 @@ fun RegistrarUsuarioView(
                 .padding(horizontal = 30.dp)
                 .padding(bottom = 15.dp)
         )
+        Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = usuario, onValueChange = { usuario = it },
             label = { Text(text = "Usuario") },
@@ -123,6 +123,7 @@ fun RegistrarUsuarioView(
                 .padding(horizontal = 30.dp)
                 .padding(bottom = 15.dp)
         )
+        Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = contraseña, onValueChange = { contraseña = it },
             label = { Text(text = "Contraseña") },
@@ -131,6 +132,7 @@ fun RegistrarUsuarioView(
                 .padding(horizontal = 30.dp)
                 .padding(bottom = 15.dp)
         )
+        Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = edad.toString(),
             onValueChange = { newValue -> edad = newValue.toIntOrNull() ?: 0 },
@@ -140,6 +142,7 @@ fun RegistrarUsuarioView(
                 .padding(horizontal = 30.dp)
                 .padding(bottom = 15.dp)
         )
+        Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = correo, onValueChange = { correo = it },
             label = { Text(text = "Correo") },
@@ -148,6 +151,7 @@ fun RegistrarUsuarioView(
                 .padding(horizontal = 30.dp)
                 .padding(bottom = 15.dp)
         )
+        Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = direccion, onValueChange = { direccion = it },
             label = { Text(text = "Dirección") },
@@ -156,6 +160,7 @@ fun RegistrarUsuarioView(
                 .padding(horizontal = 30.dp)
                 .padding(bottom = 15.dp)
         )
+        Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = pais, onValueChange = { pais = it },
             label = { Text(text = "País") },
@@ -164,6 +169,7 @@ fun RegistrarUsuarioView(
                 .padding(horizontal = 30.dp)
                 .padding(bottom = 15.dp)
         )
+        Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = ciudad, onValueChange = { ciudad = it },
             label = { Text(text = "Ciudad") },
@@ -172,6 +178,7 @@ fun RegistrarUsuarioView(
                 .padding(horizontal = 30.dp)
                 .padding(bottom = 15.dp)
         )
+        Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = codigoPostal.toString(),
             onValueChange = { newValue -> codigoPostal = newValue.toIntOrNull() ?: 0 },
@@ -181,6 +188,7 @@ fun RegistrarUsuarioView(
                 .padding(horizontal = 30.dp)
                 .padding(bottom = 15.dp)
         )
+        Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = numeroTelefono.toString(),
             onValueChange = { newValue -> numeroTelefono = newValue.toIntOrNull() ?: 0 },
@@ -190,6 +198,7 @@ fun RegistrarUsuarioView(
                 .padding(horizontal = 30.dp)
                 .padding(bottom = 15.dp)
         )
+        Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = generos.joinToString(),
             onValueChange = { generos = it.split(",").map { it.trim() } },
@@ -199,14 +208,17 @@ fun RegistrarUsuarioView(
                 .padding(horizontal = 30.dp)
                 .padding(bottom = 15.dp)
         )
+        Spacer(modifier = Modifier.height(16.dp))
         Image(
             painter = painterResource(id = R.drawable.ic_launcher_foreground),
             contentDescription = null,
             modifier = Modifier
                 .blur(radiusX = 15.dp, radiusY = 15.dp)
         )
+        Spacer(modifier = Modifier.height(16.dp))
         Button(
-            onClick = {
+            onClick = {navController.navigate(RegistroScreen),
+
                 //val b = Usuario(idUsuario, nombre, apellidos, usuario, contraseña, edad, correo, direccion, pais, ciudad, codigoPostal, numeroTelefono, generos)
             }
         ) {
