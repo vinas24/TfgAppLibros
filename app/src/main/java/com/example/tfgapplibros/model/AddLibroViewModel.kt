@@ -137,7 +137,6 @@ class AddLibroViewModel : ViewModel() {
                 _loading.value = false
 
                 _mensError.value = "No se pudo guardar el libro"
-
             })
 
     }
@@ -162,7 +161,5 @@ class AddLibroViewModel : ViewModel() {
                 _loading.value = false
             }
         }
-
     }
-
 }

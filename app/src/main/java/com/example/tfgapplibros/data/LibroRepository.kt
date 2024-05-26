@@ -62,6 +62,7 @@ class LibroRepository {
         imgRef.delete()
             .addOnSuccessListener {
                 //Esta uri esta mal
+                //ª q bn
                 imgRef.putFile(imgUri)
                     .addOnSuccessListener {
                         imgRef.downloadUrl.addOnSuccessListener {

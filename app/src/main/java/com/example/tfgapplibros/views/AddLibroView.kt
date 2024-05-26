@@ -66,7 +66,6 @@ import com.example.tfgapplibros.components.CampoTextoLargo
 import com.example.tfgapplibros.components.getColorFromResource
 import com.example.tfgapplibros.model.AddLibroViewModel
 
-
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
