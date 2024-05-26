@@ -10,4 +10,24 @@ data class Libro(
     val imgUrl: String = "",
     val descripcion: String = "",
 
-    )
+    ){
+    /*la funcion de a continuacion es para la busqueda*/
+    fun doesMatchSearchQuery(query:String) : Boolean{
+        val matchingCombinations = listOf(
+            "$titulo",
+            "$autor",
+            "$genero",
+            "$autor $genero",
+            "$autor $titulo",
+            "$titulo $autor",
+            "${autor.first()} ${titulo.first()}",
+            "${titulo.first()}",
+            "${autor.first()}"
+
+
+        )
+        return matchingCombinations.any{
+            it.contains(query, ignoreCase = true)
+        }
+    }
+}
