@@ -217,7 +217,7 @@ fun RegistrarUsuarioView(
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(
-            onClick = {navController.navigate(RegistroScreen),
+            onClick = {navController.navigate(RegistroScreen)
 
                 //val b = Usuario(idUsuario, nombre, apellidos, usuario, contraseña, edad, correo, direccion, pais, ciudad, codigoPostal, numeroTelefono, generos)
             }

@@ -116,7 +116,7 @@ class RegisterViewModel : ViewModel() {
             return
         }
 
-        val Usuario = Usuario(
+       /* val Usuario = Usuario(
             idUsuario = idUsuario,
             nombre = nombre,
             apellidos = apellidos,
@@ -130,6 +130,6 @@ class RegisterViewModel : ViewModel() {
             codigoPostal = codigoPostal,
             numeroTelefono = numeroTelefono,
             fotoPerfil = fotoPerfil
-        )
+        )*/
     }
 }

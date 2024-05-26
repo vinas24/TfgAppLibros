@@ -3,6 +3,7 @@ package com.example.tfgapplibros.views
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,12 +19,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -32,7 +35,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,11 +50,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tfgapplibros.LoginScreen
 import com.example.tfgapplibros.PerfilScreen
 import com.example.tfgapplibros.R
 import com.example.tfgapplibros.components.getColorFromResource
+import com.example.tfgapplibros.data.Libro
 import com.example.tfgapplibros.model.Autentificacion
+import com.example.tfgapplibros.model.BusquedaViewModel
 
 @Composable
 fun Principal(
@@ -69,52 +78,82 @@ fun Principal(
 fun TopBarPrincipal(
     navController: NavHostController,
     userId: String?
-) {
-    TopAppBar(
-        title = {
-            BasicTextField(
-                value = TextFieldValue(),
-                onValueChange = {},
-                modifier = Modifier.fillMaxWidth(),
 
-                )
-        },
-        actions = {
-            var expanded by remember { mutableStateOf(false) }
-            IconButton(
-                onClick = { expanded = true }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.MoreVert,
-                    contentDescription = "Menu opciones"
-                )
+) {
+
+    val viewModel = viewModel<BusquedaViewModel>()
+    val searchText by viewModel.searchText.collectAsState()
+    val libro by viewModel.libro.collectAsState()
+    val isSearching by viewModel.isSearching.collectAsState()
+    Column(modifier = Modifier.fillMaxSize()) {
+        TopAppBar(
+            title = { Text("Bookself") },
+            actions = {
+                var expanded by remember { mutableStateOf(false) }
+                IconButton(
+                    onClick = { expanded = true }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "Menu opciones"
+                    )
+                }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    Modifier.background(getColorFromResource(colorResId = R.color.background_dark))
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Mi Perfil", color = Color.Black)},
+                        onClick = {
+                            expanded = false;
+                            navController.navigate(PerfilScreen(userId = userId!!))})
+                    Divider(modifier = Modifier.padding(horizontal = 8.dp))
+                    DropdownMenuItem(
+                        text = { Text("Cerrar Sesion", color = Color.Black) },
+                        onClick = {
+                            expanded = false;
+                            Autentificacion.logout { navController.navigate(LoginScreen) }})
+                }
             }
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                Modifier.background(getColorFromResource(colorResId = R.color.background_dark))
-            ) {
-                DropdownMenuItem(
-                    text = { Text("Mi Perfil", color = Color.Black)},
-                    onClick = {
-                        expanded = false;
-                        navController.navigate(PerfilScreen(userId = userId!!))})
-                Divider(modifier = Modifier.padding(horizontal = 8.dp))
-                DropdownMenuItem(
-                    text = { Text("Cerrar Sesion", color = Color.Black) },
-                    onClick = {
-                        expanded = false;
-                        Autentificacion.logout { navController.navigate(LoginScreen) }})
+        )
+        TextField(value = searchText,
+            onValueChange = viewModel::onSearchTextChange,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+                .shadow(
+                    elevation = 5.dp,
+                    spotColor = Color.DarkGray,
+                    shape = RoundedCornerShape(10.dp)
+                ),
+            placeholder = { Text(text = "Busqueda") }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+        if (isSearching) {
+            Box(modifier = Modifier.fillMaxSize()){
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
-        },
-        modifier = Modifier
-            .padding(10.dp)
-            .shadow(
-                elevation = 5.dp,
-                spotColor = Color.DarkGray,
-                shape = RoundedCornerShape(10.dp)
-            )
-    )
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
+                items(libro) { Libro ->
+                    Text(
+                        text = "${Libro.titulo}",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp)
+                    )
+                }
+
+            }
+
+        }
+    }
 }
 
 @Composable
