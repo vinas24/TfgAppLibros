@@ -1,9 +1,12 @@
 package com.example.tfgapplibros.views
 
+import android.content.Context
+import android.os.Message
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,7 +24,6 @@ import androidx.navigation.NavHostController
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
@@ -47,18 +49,17 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tfgapplibros.LoginScreen
 import com.example.tfgapplibros.PerfilScreen
 import com.example.tfgapplibros.R
 import com.example.tfgapplibros.components.getColorFromResource
-import com.example.tfgapplibros.data.Libro
 import com.example.tfgapplibros.model.Autentificacion
 import com.example.tfgapplibros.model.BusquedaViewModel
+import com.google.firebase.auth.FirebaseAuth
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun Principal(
@@ -67,10 +68,21 @@ fun Principal(
     BackHandler {
         //Esto es para que no se pueda volver para atras
     }
+    val context = LocalContext.current
     val userId = Autentificacion.usuarioActualUid
+    val firebaseAuth = FirebaseAuth.getInstance()
+    val currentUser = firebaseAuth.currentUser
+    val currentUserId: String? = currentUser?.uid
+    val sharedPreferences = context.getSharedPreferences("user_data", Context.MODE_PRIVATE)
+    val savedUserId = sharedPreferences.getString("user_id", null)
     Scaffold(
         topBar = { TopBarPrincipal(navController,userId) }, content = { PaginaPrincipal(it,userId) }
     )
+    if (currentUserId == savedUserId) {
+        // Puedes mostrar un mensaje de bienvenida o realizar acciones específicas
+        Log.e("CurrentUser","Usuario creado correctamente")
+
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -85,6 +97,7 @@ fun TopBarPrincipal(
     val searchText by viewModel.searchText.collectAsState()
     val libro by viewModel.libro.collectAsState()
     val isSearching by viewModel.isSearching.collectAsState()
+
     Column(modifier = Modifier.fillMaxSize()) {
         TopAppBar(
             title = { Text("Bookself") },

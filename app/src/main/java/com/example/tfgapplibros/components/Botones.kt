@@ -36,3 +36,57 @@ fun BotonNormal(texto: String, enabled: Boolean, onClick: () -> Unit) {
         )
     }
 }
+
+@Composable
+fun BotonLogin(texto: String, enabled: Boolean, onClick: () -> Unit) {
+    val colorPrimMut = getColorFromResource(colorResId = R.color.primary_muted)
+    val colorPrim2 = getColorFromResource(colorResId = R.color.secondary_dark)
+    Button(
+        modifier = Modifier,
+        shape = RoundedCornerShape(16.dp),
+        enabled = enabled,
+        colors = ButtonDefaults.buttonColors(
+            disabledContainerColor = colorPrimMut,
+            containerColor = colorPrim2,
+        ),
+        onClick = onClick
+    ) {
+        Text(
+            modifier = Modifier
+                .padding(
+                    vertical = 6.dp,
+                    horizontal = 24.dp
+                ),
+            text = texto,
+            color = Color.White,
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
+}
+
+@Composable
+fun BotonRegister(texto: String, enabled: Boolean, onClick: () -> Unit) {
+    val colorPrimMut = getColorFromResource(colorResId = R.color.primary_muted)
+    val colorPrim2 = getColorFromResource(colorResId = R.color.primary)
+    Button(
+        modifier = Modifier,
+        shape = RoundedCornerShape(16.dp),
+        enabled = enabled,
+        colors = ButtonDefaults.buttonColors(
+            disabledContainerColor = colorPrimMut,
+            containerColor = colorPrim2,
+        ),
+        onClick = onClick
+    ) {
+        Text(
+            modifier = Modifier
+                .padding(
+                    vertical = 6.dp,
+                    horizontal = 24.dp
+                ),
+            text = texto,
+            color = Color.White,
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
+}

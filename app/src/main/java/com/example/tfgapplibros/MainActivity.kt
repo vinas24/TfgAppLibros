@@ -1,5 +1,6 @@
 package com.example.tfgapplibros
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -8,8 +9,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.example.tfgapplibros.data.Libro
-import com.example.tfgapplibros.data.Usuario
 import com.example.tfgapplibros.model.Autentificacion
 import com.example.tfgapplibros.ui.theme.TfgAppLibrosTheme
 import com.example.tfgapplibros.views.AddLibro
@@ -17,15 +16,18 @@ import com.example.tfgapplibros.views.LibroView
 import com.example.tfgapplibros.views.LoginView
 import com.example.tfgapplibros.views.Perfil
 import com.example.tfgapplibros.views.Principal
-import com.example.tfgapplibros.views.RegisterView
+import com.example.tfgapplibros.views.RegisterUser
 import com.google.firebase.FirebaseApp
 import kotlinx.serialization.Serializable
+import android.content.SharedPreferences
 
 class MainActivity : ComponentActivity() {
+    private lateinit var sharedPreferences: SharedPreferences
     override fun onCreate(savedInstanceState: Bundle?) {
         FirebaseApp.initializeApp(this)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        sharedPreferences = getSharedPreferences("user_data", Context.MODE_PRIVATE)
         setContent {
             TfgAppLibrosTheme {
                 val navController = rememberNavController()
@@ -43,7 +45,7 @@ class MainActivity : ComponentActivity() {
                         LoginView(navController = navController)
                     }
                     composable<RegistroScreen> {
-                        RegisterView(navController = navController)
+                        RegisterUser(navController = navController)
                     }
                     composable<PrincipalScreen> {
                         Principal(navController = navController)

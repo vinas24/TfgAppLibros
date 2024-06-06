@@ -2,6 +2,7 @@ package com.example.tfgapplibros.views
 import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,13 +19,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,7 +42,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
@@ -51,19 +58,22 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import com.example.tfgapplibros.PerfilScreen
+import com.example.tfgapplibros.PrincipalScreen
 import com.example.tfgapplibros.R
-import com.example.tfgapplibros.RegistroScreen
-import com.example.tfgapplibros.components.BotonNormal
-import com.example.tfgapplibros.components.CampoSlider
+import com.example.tfgapplibros.components.BotonRegister
+import com.example.tfgapplibros.components.CampoContrasenaRegister
 import com.example.tfgapplibros.components.CampoTexto
 import com.example.tfgapplibros.components.getColorFromResource
 import com.example.tfgapplibros.model.RegisterViewModel
@@ -87,19 +97,23 @@ fun RegisterUser(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { "Nuevo registro de usuario" },
+                title = { Text(text = "Nuevo lector", color = Color.White)  },
                 navigationIcon = {
                     IconButton(onClick = {
                         navController.popBackStack()
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            tint = Color.White,
+                            tint = getColorFromResource(colorResId = R.color.background_light),
                             contentDescription = ""
                         )
                     }
-                })
-        }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = colorResource(id = R.color.primary_dark),
+                    titleContentColor = Color.White))
+        },
+        containerColor = getColorFromResource(colorResId = R.color.background_light)
     ) {
         RegistrarUsuarioView(
             viewModel = viewModel,
@@ -120,6 +134,8 @@ fun RegistrarUsuarioView(
 ) {
     val listaGeneros = listOf("Ficcion", "Ciencia ficcion", "Fantasia", "Misterio", "Romance")
 
+    val context = LocalContext.current
+
     val nombre by viewModel.nombre.observeAsState("")
     val apellidos by viewModel.apellidos.observeAsState("")
     val nombreUsuario by viewModel.nombreUsuario.observeAsState("")
@@ -132,12 +148,13 @@ fun RegistrarUsuarioView(
     val codigoPostal by viewModel.codigoPostal.observeAsState("")
     val numeroTelefono by viewModel.numeroTelefono.observeAsState("")
     val fotoPerfil by viewModel.fotoPerfil.observeAsState()
+
     //Dropdown
-    val generos by viewModel.generos.observeAsState("")
+    val generos by viewModel.generos.observeAsState(emptyList())
     var expanded by remember { mutableStateOf(false) }
+
     //Imagen
-    //TODO: Cambiar la imagen del placeholder, q ahora mismo es fea
-    val placeholderId = R.drawable.ic_launcher_background
+    val placeholderId = R.drawable.libro
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri -> uri?.let { viewModel.fotoPerfilChange(uri) } }
@@ -145,14 +162,19 @@ fun RegistrarUsuarioView(
     val camposRellenos =
         nombre.isNotEmpty() && apellidos.isNotEmpty() && nombreUsuario.isNotEmpty() && contrasena.isNotEmpty() && edad != 0
                 && correo.isNotBlank() && direccion.isNotEmpty() && pais.isNotEmpty() && ciudad.isNotEmpty() && codigoPostal != 0
-                && numeroTelefono != 0 && fotoPerfil != null
+                && numeroTelefono != 0
 
-    //TODO: Porq esta no va pero la del login si??
+    val commonModifier =
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 30.dp)
+
     if (viewModel.loading) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = .05f)),
+                .background(Color.Black.copy(alpha = .05f))
+                .verticalScroll(rememberScrollState()),
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator(color = getColorFromResource(colorResId = R.color.primary))
@@ -170,20 +192,16 @@ fun RegistrarUsuarioView(
                 .verticalScroll(rememberScrollState())
 
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "Nuevo Lector",
-                style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Bold)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(32.dp))
             CampoTexto(
                 text = nombre,
                 onTextChanged = { viewModel.nombreChange(it) },
-                label = "Nombre de pila",
+                label = "Nombre",
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Next
-                )
+                ),
+                modifier = commonModifier
             )
             Spacer(modifier = Modifier.height(16.dp))
             CampoTexto(
@@ -193,7 +211,8 @@ fun RegistrarUsuarioView(
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done
-                )
+                ),
+                modifier = commonModifier
             )
             Spacer(modifier = Modifier.height(16.dp))
             CampoTexto(
@@ -203,27 +222,30 @@ fun RegistrarUsuarioView(
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done
-                )
+                ),
+                modifier = commonModifier
             )
             Spacer(modifier = Modifier.height(16.dp))
             CampoTexto(
                 text = correo,
                 onTextChanged = { viewModel.correoChange(it) },
-                label = "Autor del Libro",
+                label = "Correo",
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
+                    keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Done
-                )
+                ),
+                modifier = commonModifier
             )
             Spacer(modifier = Modifier.height(16.dp))
-            CampoTexto(
-                text = contrasena,
-                onTextChanged = { viewModel.contrasenaChange(it) },
+            CampoContrasenaRegister(
+                password = contrasena,
+                onPasswordChanged = { viewModel.contrasenaChange(it) },
                 label = "Contraseña",
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
+                    keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Done
-                )
+                ),
+                modifier = commonModifier
             )
             Spacer(modifier = Modifier.height(16.dp))
             CampoTexto(
@@ -233,7 +255,8 @@ fun RegistrarUsuarioView(
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done
-                )
+                ),
+                modifier = commonModifier
             )
             Spacer(modifier = Modifier.height(16.dp))
             CampoTexto(
@@ -243,7 +266,8 @@ fun RegistrarUsuarioView(
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done
-                )
+                ),
+                modifier = commonModifier
             )
             Spacer(modifier = Modifier.height(16.dp))
             CampoTexto(
@@ -253,7 +277,8 @@ fun RegistrarUsuarioView(
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done
-                )
+                ),
+                modifier = commonModifier
             )
             Spacer(modifier = Modifier.height(16.dp))
             CampoTexto(
@@ -263,7 +288,8 @@ fun RegistrarUsuarioView(
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done
-                )
+                ),
+                modifier = commonModifier
             )
             Spacer(modifier = Modifier.height(16.dp))
             CampoTexto(
@@ -273,24 +299,25 @@ fun RegistrarUsuarioView(
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done
-                )
+                ),
+                modifier = commonModifier
             )
             Spacer(modifier = Modifier.height(16.dp))
             CampoTexto(
                 text = numeroTelefono.toString(),
-                onTextChanged = { viewModel.numeroTelefonoChange(it.toInt()) },
+                onTextChanged = { viewModel.numeroTelefonoChange(it.trim().toInt()) },
                 label = "Número teléfono",
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done
-                )
+                ),
+                modifier = commonModifier
             )
             Spacer(modifier = Modifier.height(16.dp))
-            var generos = mutableListOf<String>()
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = { expanded = it },
-                modifier = Modifier.padding(horizontal = 30.dp)
+                modifier = Modifier.padding(horizontal = 60.dp)
             ) {
                 val colorPrim = getColorFromResource(colorResId = R.color.primary)
                 val colorPrim2 = getColorFromResource(colorResId = R.color.primary_dark)
@@ -300,7 +327,7 @@ fun RegistrarUsuarioView(
                     modifier = Modifier.menuAnchor(),
                     readOnly = true,
                     value = generos.joinToString(", "),
-                    onValueChange = { viewModel.generosChange(generos) },
+                    onValueChange = { },
                     label = { Text("Géneros favoritos") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     colors = ExposedDropdownMenuDefaults.textFieldColors(
@@ -326,16 +353,18 @@ fun RegistrarUsuarioView(
                         DropdownMenuItem(
                             text = { Text(text = selec, color = Color.Black) },
                             onClick = {
-                                generos.add(selec)
-                                viewModel.generosChange(generos)
-                                expanded = false
+                                if (selec !in generos){
+                                    val generosFavoritos =  generos + selec
+                                    viewModel.generosChange(generosFavoritos
+                                    )
+                            }
                             },
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                         )
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(32.dp))
             if (fotoPerfil != null) {
                 AsyncImage(
                     model = fotoPerfil,
@@ -343,7 +372,7 @@ fun RegistrarUsuarioView(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 30.dp)
-                        .aspectRatio(3f / 4f)
+                        .aspectRatio(4f / 5f)
                         .clip(RoundedCornerShape(16.dp))
                         .clickable(onClick = {
                             photoPickerLauncher.launch(
@@ -361,7 +390,7 @@ fun RegistrarUsuarioView(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 30.dp)
-                        .aspectRatio(3f / 4f)
+                        .aspectRatio(4f / 5f)
                         .clip(RoundedCornerShape(16.dp))
                         .clickable(onClick = {
                             photoPickerLauncher.launch(
@@ -381,10 +410,14 @@ fun RegistrarUsuarioView(
                     .padding(vertical = 16.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
-                BotonNormal(texto = "Crear Usuario", enabled = camposRellenos) {
+                BotonRegister(
+                    texto = "Crear Usuario",
+                    enabled = camposRellenos)
+                {
                     viewModel.registerUser() {
+                        Toast.makeText(context,"Registro exitoso", Toast.LENGTH_LONG).show()
                         navController.navigate(
-                            RegistroScreen
+                            PrincipalScreen
                         )
                     }
                 }

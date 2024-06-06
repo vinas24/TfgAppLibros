@@ -9,8 +9,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -25,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -34,9 +38,10 @@ import androidx.navigation.NavHostController
 import com.example.tfgapplibros.PrincipalScreen
 import com.example.tfgapplibros.R
 import com.example.tfgapplibros.RegistroScreen
-import com.example.tfgapplibros.components.BotonNormal
-import com.example.tfgapplibros.components.CampoContrasena
+import com.example.tfgapplibros.components.BotonLogin
+import com.example.tfgapplibros.components.CampoContrasenaLogin
 import com.example.tfgapplibros.components.CampoTexto
+import com.example.tfgapplibros.components.CampoUsuarioLogin
 import com.example.tfgapplibros.components.getColorFromResource
 import com.example.tfgapplibros.model.LoginViewModel
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -68,21 +73,21 @@ fun Login(
     }
 
     if (viewModel.loading) {
-        Log.d("fdfe", "ssssss")
+        Log.d("Login", "Inicio de Sesión")
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.Black.copy(alpha = .05f)),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator(color = getColorFromResource(colorResId = R.color.primary))
+            CircularProgressIndicator(color = getColorFromResource(colorResId = R.color.black))
         }
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(getColorFromResource(colorResId = R.color.background_light)),
+            .background(getColorFromResource(colorResId = R.color.primary_dark)),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -91,11 +96,11 @@ fun Login(
             text = "INICIAR SESION",
             style = MaterialTheme.typography.displaySmall.copy(
                 fontWeight = FontWeight.Bold,
-                color = getColorFromResource(colorResId = R.color.primary)
+                color = getColorFromResource(colorResId = R.color.background_light)
             )
         )
-        Spacer(modifier = Modifier.size(8.dp))
-        CampoTexto(
+        Spacer(modifier = Modifier.size(48.dp))
+        CampoUsuarioLogin(
             text = usuario,
             onTextChanged = { usuario = it },
             label = "Nombre de Usuario",
@@ -108,7 +113,7 @@ fun Login(
             modifier = Modifier.size(16.dp)
         )
 
-        CampoContrasena(
+        CampoContrasenaLogin(
             password = passwd,
             onPasswordChanged = { passwd = it },
             label = "Contrasena",
@@ -116,12 +121,10 @@ fun Login(
                 keyboardType = KeyboardType.Password, imeAction = ImeAction.Done
             ),
         )
-
-
         Spacer(
-            modifier = Modifier.size(16.dp)
+            modifier = Modifier.size(48.dp)
         )
-        BotonNormal(
+        BotonLogin(
             texto = "Entrar",
             enabled = camposNoVacios && !viewModel.loading,
         ) {
@@ -132,16 +135,18 @@ fun Login(
                 ) {
                     navController.navigate(PrincipalScreen)
                 }
+
             usuario = ""
             passwd = ""
         }
+
         Spacer(
             modifier = Modifier.size(48.dp)
         )
 
         Text(
             text = "No tienes cuenta todavia?",
-            color = Color.Black
+            color = getColorFromResource(colorResId = R.color.secondary)
         )
         Text(
             text = "Registrate",
@@ -149,7 +154,7 @@ fun Login(
             modifier = Modifier
                 .clickable(
                     onClick = { navController.navigate(RegistroScreen) }),
-            color = getColorFromResource(colorResId = R.color.primary)
+            color = getColorFromResource(colorResId = R.color.background)
         )
     }
 }

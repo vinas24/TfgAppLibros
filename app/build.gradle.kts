@@ -31,6 +31,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+        encoding = "UTF-8"
     }
     kotlinOptions {
         jvmTarget = "1.8"
@@ -79,16 +80,15 @@ dependencies {
 
     // Import the Firebase BoM
     implementation(platform(libs.firebase.bom))
+
     // Add the dependency for the Firebase SDK for Google Analytics
     implementation(libs.firebase.analytics)
 
     // Add the dependencies for any other Firebase products you want to use
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+
     //New navigation needs this serializable
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.ui.text.google.fonts)
-
-
-
 }
