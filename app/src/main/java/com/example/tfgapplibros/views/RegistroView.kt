@@ -1,11 +1,12 @@
 package com.example.tfgapplibros.views
 import android.annotation.SuppressLint
-import android.util.Log
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,39 +16,37 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -55,36 +54,34 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.tfgapplibros.PrincipalScreen
 import com.example.tfgapplibros.R
+import com.example.tfgapplibros.components.BotonNormal
 import com.example.tfgapplibros.components.BotonRegister
 import com.example.tfgapplibros.components.CampoContrasenaRegister
 import com.example.tfgapplibros.components.CampoTexto
 import com.example.tfgapplibros.components.getColorFromResource
 import com.example.tfgapplibros.model.RegisterViewModel
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterUser(
     navController : NavHostController,
-    idUsuario : String? = null,
     viewModel : RegisterViewModel = viewModel()
 ) {
     Scaffold(
@@ -108,13 +105,209 @@ fun RegisterUser(
         },
         containerColor = getColorFromResource(colorResId = R.color.background_light)
     ) {
-        RegistrarUsuarioView(
-            viewModel = viewModel,
-            navController = navController,
-            idUsuario = idUsuario
-        )
+        RegisterView(viewModel = viewModel , navController = navController)
+//        RegistrarUsuarioView(
+//            viewModel = viewModel,
+//            navController = navController,
+//            idUsuario = idUsuario)
     }
 }
+
+@Composable
+fun RegisterView(
+    viewModel: RegisterViewModel,
+    navController: NavHostController) {
+    var pestanaAct by remember { mutableStateOf(1) }
+    Column (
+        modifier = Modifier
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        AnimatedVisibility(
+            visible = pestanaAct == 1,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            RegistroParte1(viewModel = viewModel, siguiente = {pestanaAct = 2})
+        }
+        AnimatedVisibility(
+            visible = pestanaAct == 2,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            RegistroParte2(viewModel = viewModel, navController = navController, anterior = {pestanaAct = 1})
+        }
+    }
+}
+
+@Composable
+fun RegistroParte1(
+    viewModel : RegisterViewModel,
+    siguiente: () -> Unit) {
+    Column (
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally){
+
+        val nombreUsuario by viewModel.nombreUsuario.observeAsState("")
+        val contrasena  by viewModel.contrasena.observeAsState("")
+        val contrasenaRep  by viewModel.contrasena.observeAsState("")
+        val fotoPerfil by viewModel.fotoPerfil.observeAsState()
+        val correo by viewModel.correo.observeAsState("")
+
+        val camposRellenos =
+            nombreUsuario.isNotEmpty() && contrasena.isNotEmpty() && correo.isNotEmpty() && fotoPerfil != null
+
+        //Imagen
+        val placeholderId = R.drawable.libro
+        val photoPickerLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.PickVisualMedia(),
+            onResult = { uri -> uri?.let { viewModel.fotoPerfilChange(uri) } }
+        )
+        Spacer(modifier = Modifier.size(16.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp), horizontalArrangement = Arrangement.Center
+        ) {
+            if (fotoPerfil != null) {
+                AsyncImage(
+                    model = fotoPerfil,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .size(200.dp)
+                        .clip(CircleShape)
+                        .clickable(onClick = {
+                            photoPickerLauncher.launch(
+                                PickVisualMediaRequest(
+                                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                                )
+                            )
+                        }),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = placeholderId),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .size(200.dp)
+                        .clip(CircleShape)
+                        .clickable(onClick = {
+                            photoPickerLauncher.launch(
+                                PickVisualMediaRequest(
+                                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                                )
+                            )
+                        }
+                        ),
+                    contentScale = ContentScale.Crop
+                )
+            }
+        }
+        Spacer(modifier = Modifier.size(32.dp))
+
+        CampoTexto(
+            text = nombreUsuario,
+            onTextChanged = { viewModel.nombreUsuarioChange(it) },
+            label = "Nombre de Usuario",
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Done
+            ),
+
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        CampoTexto(
+            text = correo,
+            onTextChanged = { viewModel.correoChange(it) },
+            label = "Correo",
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Done
+            ),
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        CampoContrasenaRegister(
+            password = contrasena,
+            onPasswordChanged = { viewModel.contrasenaChange(it) },
+            label = "Contraseña",
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Done
+            ),
+        )
+
+        //TODO: Hacer la de duplicar la contraseña
+//        CampoContrasenaRegister(
+//            password = contrasenaRep,
+//            onPasswordChanged = { viewModel.contrasenaChange(it) },
+//            label = "Repetir contraseña",
+//            keyboardOptions = KeyboardOptions(
+//                keyboardType = KeyboardType.Password,
+//                imeAction = ImeAction.Done
+//            ),
+//        )
+//        Spacer(modifier = Modifier.height(16.dp))
+
+        Spacer(modifier = Modifier.height(40.dp))
+        //TODO: Poner lo del checkeo de la doble contraseña
+        BotonNormal(texto = "Siguente", enabled = camposRellenos, onClick = siguiente)
+    }
+}
+
+@Composable
+fun RegistroParte2(
+    viewModel : RegisterViewModel,
+    navController: NavHostController,
+    anterior: () -> Unit) {
+    ElevatedCard (
+        shape = RectangleShape,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 90.dp)
+            .height(50.dp),
+        elevation = CardDefaults.elevatedCardElevation(8.dp)
+    ) {
+        Row (
+           modifier = Modifier
+               .fillMaxWidth()
+               .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                tint = Color.Black,
+                contentDescription = ""
+            )
+            Spacer(modifier = Modifier.size(100.dp))
+            Text(text = "Datos Personales")
+            
+        }
+    }
+    Column (
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        val nombre by viewModel.nombre.observeAsState("")
+        val apellidos by viewModel.apellidos.observeAsState("")
+        val ciudad by viewModel.ciudad.observeAsState("")
+        val pais by viewModel.pais.observeAsState("")
+        val numeroTelefono by viewModel.numeroTelefono.observeAsState("")
+
+        val listaGeneros = listOf("Ficcion", "Ciencia ficcion", "Fantasia", "Misterio", "Romance")
+    }
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -130,7 +323,7 @@ fun RegistrarUsuarioView(
     val nombre by viewModel.nombre.observeAsState("")
     val apellidos by viewModel.apellidos.observeAsState("")
     val nombreUsuario by viewModel.nombreUsuario.observeAsState("")
-    val contrasena  by viewModel.contrasena.observeAsState("")
+    val contrasena by viewModel.contrasena.observeAsState("")
     val edad by viewModel.edad.observeAsState("")
     val correo by viewModel.correo.observeAsState("")
     val direccion by viewModel.direccion.observeAsState("")
@@ -345,11 +538,12 @@ fun RegistrarUsuarioView(
                         DropdownMenuItem(
                             text = { Text(text = selec, color = Color.Black) },
                             onClick = {
-                                if (selec !in generos){
-                                    val generosFavoritos =  generos + selec
-                                    viewModel.generosChange(generosFavoritos
+                                if (selec !in generos) {
+                                    val generosFavoritos = generos + selec
+                                    viewModel.generosChange(
+                                        generosFavoritos
                                     )
-                            }
+                                }
                             },
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                         )
@@ -404,10 +598,11 @@ fun RegistrarUsuarioView(
             ) {
                 BotonRegister(
                     texto = "Crear Usuario",
-                    enabled = camposRellenos)
+                    enabled = camposRellenos
+                )
                 {
                     viewModel.registerUser() {
-                        Toast.makeText(context,"Registro exitoso", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, "Registro exitoso", Toast.LENGTH_LONG).show()
                         navController.navigate(
                             PrincipalScreen
                         )
@@ -417,3 +612,4 @@ fun RegistrarUsuarioView(
         }
     }
 }
+
