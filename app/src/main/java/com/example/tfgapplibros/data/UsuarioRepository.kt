@@ -8,7 +8,20 @@ import kotlinx.coroutines.tasks.await
 class UsuarioRepository {
     private val db = FirebaseFirestore.getInstance()
     private val storage = FirebaseStorage.getInstance()
+/*
+    suspend fun crearUsuario(usuario: Usuario, password: String): Result<Usuario> {
+        return try {
+            val authResult = db.createUserWithEmailAndPassword(usuario.correo, password).await()
+            val userId = authResult.user?.uid ?: throw Exception("User ID is null")
+            val usuarioConId = usuario.copy(idUsuario = userId)
+            firestore.collection("usuarios").document(userId).set(usuarioConId).await()
+            Result.success(usuarioConId)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 
+ */
     fun guardarUsuario(
         usuario: Usuario,
         fotoPerfil: Uri?,
