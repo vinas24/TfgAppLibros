@@ -87,14 +87,6 @@ fun RegisterUser(
     idUsuario : String? = null,
     viewModel : RegisterViewModel = viewModel()
 ) {
-    val esEditando = idUsuario != null
-
-    Log.d("modificar",esEditando.toString())
-    SideEffect {
-        if (esEditando) {
-            viewModel.cargarDetallesUsuario(idUsuario!!)
-        }
-    }
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -119,7 +111,6 @@ fun RegisterUser(
         RegistrarUsuarioView(
             viewModel = viewModel,
             navController = navController,
-            esEditando = esEditando,
             idUsuario = idUsuario
         )
     }
@@ -130,7 +121,6 @@ fun RegisterUser(
 fun RegistrarUsuarioView(
     viewModel : RegisterViewModel,
     navController : NavHostController,
-    esEditando : Boolean,
     idUsuario : String?
 ) {
     val listaGeneros = listOf("Ficcion", "Ciencia ficcion", "Fantasia", "Misterio", "Romance")

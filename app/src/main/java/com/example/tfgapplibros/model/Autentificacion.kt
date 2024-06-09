@@ -1,10 +1,13 @@
 package com.example.tfgapplibros.model
 
+import coil.compose.AsyncImagePainter
+import com.example.tfgapplibros.data.Usuario
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
 object Autentificacion {
+
     val firebaseAuth: FirebaseAuth by lazy { Firebase.auth }
 
     val usuarioActualUid: String?

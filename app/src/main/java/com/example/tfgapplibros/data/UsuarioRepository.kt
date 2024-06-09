@@ -1,27 +1,31 @@
 package com.example.tfgapplibros.data
 
 import android.net.Uri
+import com.example.tfgapplibros.model.Autentificacion
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
 
 class UsuarioRepository {
     private val db = FirebaseFirestore.getInstance()
     private val storage = FirebaseStorage.getInstance()
-/*
-    suspend fun crearUsuario(usuario: Usuario, password: String): Result<Usuario> {
-        return try {
-            val authResult = db.createUserWithEmailAndPassword(usuario.correo, password).await()
-            val userId = authResult.user?.uid ?: throw Exception("User ID is null")
-            val usuarioConId = usuario.copy(idUsuario = userId)
-            firestore.collection("usuarios").document(userId).set(usuarioConId).await()
-            Result.success(usuarioConId)
-        } catch (e: Exception) {
-            Result.failure(e)
+
+    fun crearUsuario(correo : String, password : String, onSuccess : () -> Unit, onFailure : (Exception) -> Unit ){
+        Autentificacion.firebaseAuth.createUserWithEmailAndPassword(correo, password).addOnCompleteListener(){
+                task ->
+            if(task.isSuccessful){
+                onSuccess()
+            } else {
+                task.exception?.let{
+                    exception -> onFailure(exception)
+                }
+            }
         }
     }
 
- */
     fun guardarUsuario(
         usuario: Usuario,
         fotoPerfil: Uri?,
