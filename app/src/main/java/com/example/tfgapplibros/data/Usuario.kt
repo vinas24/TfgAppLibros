@@ -1,6 +1,5 @@
 package com.example.tfgapplibros.data
 
-import java.io.StringBufferInputStream
 
 data class Usuario(
     val idUsuario : String = "",

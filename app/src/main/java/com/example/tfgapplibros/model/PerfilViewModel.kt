@@ -3,11 +3,15 @@ package com.example.tfgapplibros.model
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tfgapplibros.data.Libro
 import com.example.tfgapplibros.data.LibroRepository
+import com.example.tfgapplibros.data.Usuario
+import com.example.tfgapplibros.data.UsuarioRepository
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.firestore.toObject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -16,8 +20,14 @@ import kotlin.math.log
 
 class PerfilViewModel() : ViewModel(){
 
+    private val usuarioRepo = UsuarioRepository()
+
     private val _libros = MutableStateFlow<List<Libro>>(emptyList())
     val libros: StateFlow<List<Libro>> = _libros
+
+    private val _datosUser = MutableStateFlow<Usuario?>(null)
+
+    val datosUser: StateFlow<Usuario?> = _datosUser
 
     fun obtenerLibros(userId: String) {
         viewModelScope.launch {
@@ -49,4 +59,16 @@ class PerfilViewModel() : ViewModel(){
         }
         return libros
     }
+
+
+    fun cargarPerfil(userId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+
+            val user = usuarioRepo.obtenerUsuarioPorId(userId)
+            if (user != null) {
+                _datosUser.value = user
+            }
+        }
+    }
+
 }

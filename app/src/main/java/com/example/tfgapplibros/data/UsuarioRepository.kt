@@ -1,6 +1,7 @@
 package com.example.tfgapplibros.data
 
 import android.net.Uri
+import android.util.Log
 import com.example.tfgapplibros.model.Autentificacion
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -13,11 +14,12 @@ class UsuarioRepository {
     private val db = FirebaseFirestore.getInstance()
     private val storage = FirebaseStorage.getInstance()
 
-    fun crearUsuario(correo : String, password : String, onSuccess : () -> Unit, onFailure : (Exception) -> Unit ){
-        Autentificacion.firebaseAuth.createUserWithEmailAndPassword(correo, password).addOnCompleteListener(){
+    fun crearUsuario(correo : String, password : String, onSuccess : (String) -> Unit, onFailure : (Exception) -> Unit ){
+        Autentificacion.firebaseAuth.createUserWithEmailAndPassword(correo, password).addOnCompleteListener{
                 task ->
             if(task.isSuccessful){
-                onSuccess()
+                var userId = Autentificacion.usuarioActualUid!!
+                onSuccess(userId)
             } else {
                 task.exception?.let{
                     exception -> onFailure(exception)
@@ -27,22 +29,21 @@ class UsuarioRepository {
     }
 
     fun guardarUsuario(
+        usuId: String,
         usuario: Usuario,
         fotoPerfil: Uri?,
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
-        val idUsuario = db
-            .collection("usuarios")
-            .document().id
-        val imgRef = storage.reference.child("usuarios/$idUsuario.jpg")
+
+        val imgRef = storage.reference.child("usuarios/$usuId.jpg")
 
         if (fotoPerfil != null) {
             imgRef.putFile(fotoPerfil)
                 .addOnSuccessListener {
                     imgRef.downloadUrl.addOnSuccessListener {
-                        val usuarioActualizado = usuario.copy(fotoPerfil = it.toString(), idUsuario = idUsuario)
-                        guardarUsuarioDb(idUsuario, usuarioActualizado, onSuccess, onFailure)
+                        val usuarioActualizado = usuario.copy(fotoPerfil = it.toString(), idUsuario = usuId)
+                        guardarUsuarioDb(usuId, usuarioActualizado, onSuccess, onFailure)
                     }.addOnFailureListener { onFailure(it) }
                 }.addOnFailureListener { onFailure(it) }
         }
@@ -60,28 +61,29 @@ class UsuarioRepository {
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { onFailure(it) }
     }
+    //TODO: Esto se realizará en un futuro hopefuully
+//    fun actualizarUsuario(
+//        idUsuario: String,
+//        usuario: Usuario,
+//        fotoPerfil: Uri,
+//        onSuccess: () -> Unit,
+//        onFailure: (Exception) -> Unit
+//    ) {
+//        val imgRef = storage.reference.child("usuarios/$idUsuario.jpg")
+//        imgRef.delete()
+//            .addOnSuccessListener {
+//                //Esta uri esta mal
+//                imgRef.putFile(fotoPerfil)
+//                    .addOnSuccessListener {
+//                        imgRef.downloadUrl.addOnSuccessListener {
+//                            val usuarioActualizado =
+//                                usuario.copy(fotoPerfil = it.toString(), idUsuario = idUsuario)
+//                            guardarUsuarioDb(idUsuario, usuarioActualizado, onSuccess, onFailure)
+//                        }.addOnFailureListener { onFailure(it) }
+//                    }.addOnFailureListener { onFailure(it) }
+//            }.addOnFailureListener { onFailure(it) }
+//    }
 
-    fun actualizarUsuario(
-        idUsuario: String,
-        usuario: Usuario,
-        fotoPerfil: Uri,
-        onSuccess: () -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-        val imgRef = storage.reference.child("usuarios/$idUsuario.jpg")
-        imgRef.delete()
-            .addOnSuccessListener {
-                //Esta uri esta mal
-                imgRef.putFile(fotoPerfil)
-                    .addOnSuccessListener {
-                        imgRef.downloadUrl.addOnSuccessListener {
-                            val usuarioActualizado =
-                                usuario.copy(fotoPerfil = it.toString(), idUsuario = idUsuario)
-                            guardarUsuarioDb(idUsuario, usuarioActualizado, onSuccess, onFailure)
-                        }.addOnFailureListener { onFailure(it) }
-                    }.addOnFailureListener { onFailure(it) }
-            }.addOnFailureListener { onFailure(it) }
-    }
 
     suspend fun obtenerUsuarioPorId(idUsuario: String): Usuario? {
         return try {
@@ -91,9 +93,10 @@ class UsuarioRepository {
                 .get()
                 .await()
             if (document.exists()) {
-                val usuario = document.toObject(Usuario::class.java)
+                var user = document.toObject(Usuario::class.java)
+                Log.d("userrrrrr", user.toString())
+                user
 
-                usuario
             } else {
                 null
             }
@@ -103,21 +106,22 @@ class UsuarioRepository {
         }
     }
 
-    fun borrarUsuario(
-        idUsuario : String,
-        fotoPerfil : String,
-        onSuccess: () -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-        val usuarioRef =
-            db.collection("usuarios").document(idUsuario)
-        val imgRef = storage.getReferenceFromUrl(fotoPerfil)
-
-        usuarioRef.delete()
-            .addOnSuccessListener {
-                imgRef.delete()
-                    .addOnSuccessListener { onSuccess() }
-                    .addOnFailureListener { onFailure(it) }
-            }.addOnFailureListener { onFailure(it) }
-    }
+    //TODO: Posible extra si da tiempo
+//    fun borrarUsuario(
+//        idUsuario : String,
+//        fotoPerfil : String,
+//        onSuccess: () -> Unit,
+//        onFailure: (Exception) -> Unit
+//    ) {
+//        val usuarioRef =
+//            db.collection("usuarios").document(idUsuario)
+//        val imgRef = storage.getReferenceFromUrl(fotoPerfil)
+//
+//        usuarioRef.delete()
+//            .addOnSuccessListener {
+//                imgRef.delete()
+//                    .addOnSuccessListener { onSuccess() }
+//                    .addOnFailureListener { onFailure(it) }
+//            }.addOnFailureListener { onFailure(it) }
+//    }
 }

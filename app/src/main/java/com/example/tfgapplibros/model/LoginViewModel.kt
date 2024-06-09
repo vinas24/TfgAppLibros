@@ -34,7 +34,6 @@ class LoginViewModel: ViewModel() {
                     } else {
                         _loginError.value = "Error al iniciar sesion. Comprueba tus credenciales."
                         _loading.value = false
-
                     }
                 }
         } catch (es: Exception) {

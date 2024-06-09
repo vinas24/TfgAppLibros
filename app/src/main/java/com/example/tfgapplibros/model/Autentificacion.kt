@@ -23,4 +23,7 @@ object Autentificacion {
     fun checkUsuarioGuardado(): Boolean {
         return firebaseAuth.currentUser != null
     }
+
+
+
 }

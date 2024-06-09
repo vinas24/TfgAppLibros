@@ -68,6 +68,7 @@ import com.example.tfgapplibros.components.CartaLibroPerfil
 import com.example.tfgapplibros.components.getColorFromResource
 import com.example.tfgapplibros.components.toColor
 import com.example.tfgapplibros.data.Libro
+import com.example.tfgapplibros.data.Usuario
 import com.example.tfgapplibros.model.PerfilViewModel
 
 
@@ -132,9 +133,11 @@ fun Contenido(
 ) {
     val viewModel: PerfilViewModel = viewModel()
     val libros by viewModel.libros.collectAsState()
+    val datosUser by viewModel.datosUser.collectAsState()
 
     LaunchedEffect(userId) {
         viewModel.obtenerLibros(userId = userId)
+        viewModel.cargarPerfil(userId)
     }
     Column(
         modifier = Modifier
@@ -143,14 +146,16 @@ fun Contenido(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Divider(thickness = 2.dp, color = Color.Gray)
-        DatosPerfil()
+        DatosPerfil(datosUser)
         MisLibros(navController, libros)
     }
 }
 
 @Composable
 fun DatosPerfil(
+    datosUser: Usuario?,
     modifier: Modifier = Modifier
+
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -176,6 +181,7 @@ fun DatosPerfil(
             )
             Spacer(modifier = Modifier.width(16.dp))
             Biografia(
+                datosUser = datosUser,
                 modifier = Modifier
                     .weight(7f)
                     .padding(end = 12.dp)
@@ -222,14 +228,16 @@ fun DatosPerfil(
 
 @Composable
 fun Biografia(
+    datosUser: Usuario?,
     modifier: Modifier = Modifier,
+
 ) {
     Column(
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.SpaceAround,
         modifier = modifier
     ) {
-        Text(text = "Nombre de Usuario", fontSize = 20.sp, color = getColorFromResource(colorResId = R.color.background_dark), fontWeight = FontWeight.Bold)
+        Text(text = datosUser?.nombreUsuario?:"nada", fontSize = 20.sp, color = getColorFromResource(colorResId = R.color.background_dark), fontWeight = FontWeight.Bold)
         Text(text = "Ciudad, Pais", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
         Spacer(modifier = Modifier.height(8.dp))
         Text(

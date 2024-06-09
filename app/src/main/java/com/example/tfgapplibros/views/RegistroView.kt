@@ -239,6 +239,7 @@ fun RegistrarUsuarioView(
                 modifier = commonModifier
             )
             Spacer(modifier = Modifier.height(16.dp))
+            //TODO: cambiar a tipo string y que el check se haga en el VM
             CampoTexto(
                 text = edad.toString(),
                 onTextChanged = { viewModel.edadChange(it.toInt()) },

@@ -166,7 +166,7 @@ class RegisterViewModel : ViewModel() {
         usuarioRepository.crearUsuario(correo, contrasena,
             onSuccess = {
                 _mensOk.value = "Usuario creado"
-                usuarioRepository.guardarUsuario(usuario, fotoPerfil,
+                usuarioRepository.guardarUsuario(it, usuario, fotoPerfil,
                     onSuccess = {
                         _mensOk.value = "Usuario guardado"
                         perfil()
