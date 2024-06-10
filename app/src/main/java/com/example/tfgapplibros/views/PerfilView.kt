@@ -236,8 +236,10 @@ fun DatosPerfil(
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
                 {
-                    items(generos) { gen ->
-                        CajaGenero(nombre = gen, 14.sp)
+                    if (datosUser != null) {
+                        items(datosUser.generos) { gen ->
+                            CajaGenero(nombre = gen, 14.sp)
+                        }
                     }
                 }
             }
@@ -288,6 +290,7 @@ fun MisLibros(
             Text(
                 text = "Mis Libros:",
                 fontSize = 20.sp,
+                color = Color.Black,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
         }

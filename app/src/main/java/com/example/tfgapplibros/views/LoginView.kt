@@ -93,7 +93,7 @@ fun Login(
     ) {
 
         Text(
-            text = "INICIAR SESION",
+            text = "INICIAR SESIÓN",
             style = MaterialTheme.typography.displaySmall.copy(
                 fontWeight = FontWeight.Bold,
                 color = getColorFromResource(colorResId = R.color.background_light)
@@ -103,7 +103,7 @@ fun Login(
         CampoUsuarioLogin(
             text = usuario,
             onTextChanged = { usuario = it },
-            label = "Nombre de Usuario",
+            label = "Correo electrónico",
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email, imeAction = ImeAction.Next
             ),
@@ -116,7 +116,7 @@ fun Login(
         CampoContrasenaLogin(
             password = passwd,
             onPasswordChanged = { passwd = it },
-            label = "Contrasena",
+            label = "Contraseña",
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password, imeAction = ImeAction.Done
             ),

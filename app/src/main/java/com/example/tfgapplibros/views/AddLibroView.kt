@@ -136,7 +136,7 @@ fun AddLibroContenido(
     var expanded by remember { mutableStateOf(false) }
     //Imagen
     //TODO: Cambiar la imagen del placeholder, q ahora mismo es fea
-    val placeholderId = R.drawable.ic_launcher_background
+    val placeholderId = R.drawable.libro
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri -> uri?.let { viewModel.newImagenSelec(uri) } }
