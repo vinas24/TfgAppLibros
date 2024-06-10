@@ -22,6 +22,17 @@ class LibroViewModel : ViewModel() {
     private val _loading = mutableStateOf(false)
     val loading get() = _loading.value
 
+    private val _liked = MutableLiveData(false)
+    val liked: LiveData<Boolean> = _liked
+
+    fun likeChange() {
+        if (_liked.value == true) {
+            _liked.value = false
+        } else {
+            _liked.value = true
+        }
+    }
+
     fun obtenerLibro(libroId: String?, userId: String?, onComplete: (Libro?) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             if (libroId != null && userId != null) {

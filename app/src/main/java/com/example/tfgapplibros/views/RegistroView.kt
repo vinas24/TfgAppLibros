@@ -119,7 +119,7 @@ fun RegistrarUsuarioView(
     viewModel : RegisterViewModel,
     navController : NavHostController
 ) {
-    val listaGeneros = listOf("Ficcion", "Ciencia ficcion", "Fantasia", "Misterio", "Romance")
+    var listaGeneros = listOf("Ficción", "Fantasía", "Misterio", "Romance", "Histórica", "Poesía", "Infantil", "Juveníl", "Autoayuda", "Biográfica" )
 
     val context = LocalContext.current
 

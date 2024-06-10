@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -68,7 +69,7 @@ fun LibroView(
     }
 
     if (libro != null) {
-        ContenidoLibro(libro!!, navController, viewModel = viewModel)
+        ContenidoLibro(libro!!, userId, navController, viewModel = viewModel)
     } else {
         //TODO: tocara hacer un mensaje de error o algo
     }
@@ -78,6 +79,7 @@ fun LibroView(
 @Composable
 fun ContenidoLibro(
     libro: Libro,
+    userId: String,
     navController: NavHostController,
     viewModel: LibroViewModel
 ) {
@@ -148,8 +150,13 @@ fun ContenidoLibro(
             verticalArrangement = Arrangement.Top,
 
             ) {
+            val liked = viewModel.liked.observeAsState(false)
             //TODO: Pasar una accion Para que el action button solo salga si no es nuestro el libro
-            ImagenConLikeButton(libro = libro) { /*TODO: Accion de like/Dislike*/ }
+            ImagenConLikeButton(
+                libro = libro,
+                userId = userId ,
+                liked = liked.value
+            ) { viewModel.likeChange()}
             Column(
                 modifier = Modifier.padding(
                     horizontal = 16.dp
