@@ -31,6 +31,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -52,6 +53,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
@@ -59,6 +61,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import coil.size.Size
 import com.example.tfgapplibros.AddLibroScreen
 import com.example.tfgapplibros.LibroScreen
@@ -142,7 +145,7 @@ fun Contenido(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 95.dp),
+            .padding(top = 85.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Divider(thickness = 2.dp, color = Color.Gray)
@@ -168,17 +171,34 @@ fun DatosPerfil(
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
                 .fillMaxWidth()
+                .padding(horizontal = 16.dp)
         ) {
-            //Cambiar imagen a imagen de perfil
-            ImagenRedonda(
-                image = painterResource(
-                    id = R.drawable.ic_launcher_foreground
-                ),
-                modifier = Modifier
-                    .size(130.dp)
-                    .weight(4f)
-                    .padding(start = 10.dp)
-            )
+            if(datosUser != null) {
+                AsyncImage(
+                    model = datosUser.fotoPerfil,
+                    contentDescription = "Foto de perfil",
+                    contentScale = ContentScale.Crop,
+                    modifier = modifier
+                        .size(120.dp)
+                        .aspectRatio(1f, matchHeightConstraintsFirst = true)
+                        .border(
+                            width = 1.dp,
+                            color = Color.LightGray,
+                            shape = CircleShape
+                        )
+                        .padding(2.dp)
+                        .clip(CircleShape)
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .size(120.dp)
+                        .background(color = getColorFromResource(colorResId = R.color.primary))
+                        .align(alignment = Alignment.CenterVertically)
+                ) {
+                    CircularProgressIndicator(color = getColorFromResource(colorResId = R.color.secondary_dark))
+                }
+            }
             Spacer(modifier = Modifier.width(16.dp))
             Biografia(
                 datosUser = datosUser,
@@ -237,11 +257,11 @@ fun Biografia(
         verticalArrangement = Arrangement.SpaceAround,
         modifier = modifier
     ) {
-        Text(text = datosUser?.nombreUsuario?:"nada", fontSize = 20.sp, color = getColorFromResource(colorResId = R.color.background_dark), fontWeight = FontWeight.Bold)
-        Text(text = "Ciudad, Pais", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+        Text(text = datosUser?.nombreUsuario?:"...", fontSize = 20.sp, color = getColorFromResource(colorResId = R.color.background_dark), fontWeight = FontWeight.Bold)
+        Text(text = "${datosUser?.ciudad?:"..."}, ${datosUser?.pais?:"..."}", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Una breve descripcion de uno mismo, con que libros le gusta leer y poco más.",
+            text = "texto provisional, deberia ser una bio : ${datosUser?.direccion?:"....."}",
             fontSize = 16.sp,
             lineHeight = 18.sp,
             color = Color.White

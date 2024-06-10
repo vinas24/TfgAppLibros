@@ -80,7 +80,7 @@ import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterUser(
+fun RegisterUser (
     navController : NavHostController,
     viewModel : RegisterViewModel = viewModel()
 ) {

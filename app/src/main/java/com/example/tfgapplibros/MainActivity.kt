@@ -38,7 +38,6 @@ class MainActivity : ComponentActivity() {
                         PrincipalScreen
                     } else {
                         LoginScreen
-
                     }
                 ) {
                     composable<LoginScreen> {
