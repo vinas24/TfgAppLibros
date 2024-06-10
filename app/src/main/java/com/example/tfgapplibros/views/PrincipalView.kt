@@ -1,9 +1,6 @@
 package com.example.tfgapplibros.views
 
-import android.content.Context
-import android.os.Message
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -23,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -39,8 +37,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -60,10 +60,13 @@ import com.example.tfgapplibros.model.Autentificacion
 import com.example.tfgapplibros.model.BusquedaViewModel
 import com.google.firebase.auth.FirebaseAuth
 import androidx.compose.ui.platform.LocalContext
+import com.example.tfgapplibros.data.Libro
+import com.example.tfgapplibros.model.PrincipalVIewModel
 
 @Composable
 fun Principal(
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: PrincipalVIewModel = viewModel()
 ) {
     BackHandler {
         //Esto es para que no se pueda volver para atras
@@ -73,16 +76,15 @@ fun Principal(
     val firebaseAuth = FirebaseAuth.getInstance()
     val currentUser = firebaseAuth.currentUser
     val currentUserId: String? = currentUser?.uid
-    val sharedPreferences = context.getSharedPreferences("user_data", Context.MODE_PRIVATE)
-    val savedUserId = sharedPreferences.getString("user_id", null)
-    Scaffold(
-        topBar = { TopBarPrincipal(navController,userId) }, content = { PaginaPrincipal(it,userId) }
-    )
-    if (currentUserId == savedUserId) {
-        // Puedes mostrar un mensaje de bienvenida o realizar acciones específicas
-        Log.e("CurrentUser","Usuario creado correctamente")
-
+    val libros by viewModel.libros.observeAsState(initial = emptyList())
+    val listState = rememberLazyListState()
+    LaunchedEffect(Unit) {
+        Log.d("Librooooos",currentUserId?:"")
+        viewModel.recogerLibros(currentUserId ?: "")
     }
+    Scaffold(
+        topBar = { TopBarPrincipal(navController,userId) }, content = { PaginaPrincipal(it,userId, libros, viewModel) }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -162,7 +164,6 @@ fun TopBarPrincipal(
                             .padding(vertical = 16.dp)
                     )
                 }
-
             }
 
         }
@@ -172,15 +173,23 @@ fun TopBarPrincipal(
 @Composable
 fun PaginaPrincipal(
     it: PaddingValues,
-    userId: String?
+    userId: String?,
+    libros: List<Libro>,
+    viewModel: PrincipalVIewModel
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp)
     ) {
-        items(10) { index ->
-            MyCard("titulo","Autor", null)
+        items(libros) { libro ->
+            Log.d("Librooooos", libro.toString())
+            //Text(text = libro.titulo)
+            MyCard(libro.titulo,libro.autor, null)
             Spacer(modifier = Modifier.height(16.dp))
+        }
+        item {
+            if (viewModel.loading)
+                CircularProgressIndicator(modifier = Modifier.padding(16.dp))
         }
     }
 }

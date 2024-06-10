@@ -1,7 +1,12 @@
 package com.example.tfgapplibros.data
 
 import android.net.Uri
+import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
 
@@ -115,5 +120,20 @@ class LibroRepository {
                     .addOnSuccessListener { onSuccess() }
                     .addOnFailureListener { onFailure(it) }
             }.addOnFailureListener { onFailure(it) }
+    }
+
+    fun librosPrincipal(excludeId: String, lastDocumentSnapshot: DocumentSnapshot? = null, limit: Long = 10): LiveData<List<Libro>> {
+        val librosLiveData = MutableLiveData<List<Libro>>()
+        val librosCollection = db.collectionGroup("libros")
+
+        //librosCollection.whereNotEqualTo("userId", excludeId).get()
+            librosCollection.get()
+            .addOnSuccessListener { querySnapshot ->
+            val libros = querySnapshot.documents.mapNotNull { it.toObject(Libro::class.java) }
+            librosLiveData.value = libros
+        }.addOnFailureListener {
+            //TODO: Que hacer en caso de error
+        }
+        return librosLiveData
     }
 }
