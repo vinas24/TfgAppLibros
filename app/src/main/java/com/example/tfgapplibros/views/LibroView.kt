@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
@@ -135,6 +136,15 @@ fun ContenidoLibro(
                                         navController.navigate(PerfilScreen(userId = libro.userId))
                                     }
                                 })
+                        }
+                    } else {
+                        IconButton(onClick = {
+                            navController.navigate(PerfilScreen(userId = libro.userId))
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.AccountCircle,
+                                tint = Color.White,
+                                contentDescription = null)
                         }
                     }
 

@@ -39,7 +39,7 @@ fun ImagenConLikeButton(libro: Libro, userId: String, liked: Boolean, onLike: (L
                 .fillMaxWidth()
                 .aspectRatio(3f / 4f),
         )
-        if (libro.userId == userId) {
+        if (libro.userId != userId) {
             FloatingActionButton(
                 onClick = { onLike(libro) },
                 modifier = androidx.compose.ui.Modifier
