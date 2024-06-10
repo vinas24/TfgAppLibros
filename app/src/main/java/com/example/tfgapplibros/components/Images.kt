@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.tfgapplibros.R
 import com.example.tfgapplibros.data.Libro
+import com.example.tfgapplibros.model.Autentificacion
 import kotlin.math.sin
 
 @Composable
@@ -39,7 +40,7 @@ fun ImagenConLikeButton(libro: Libro, userId: String, liked: Boolean, onLike: (L
                 .fillMaxWidth()
                 .aspectRatio(3f / 4f),
         )
-        if (libro.userId != userId) {
+        if (libro.userId != Autentificacion.usuarioActualUid) {
             FloatingActionButton(
                 onClick = { onLike(libro) },
                 modifier = androidx.compose.ui.Modifier

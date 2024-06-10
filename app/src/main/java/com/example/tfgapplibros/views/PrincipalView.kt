@@ -19,8 +19,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -44,6 +46,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -60,8 +63,12 @@ import com.example.tfgapplibros.model.Autentificacion
 import com.example.tfgapplibros.model.BusquedaViewModel
 import com.google.firebase.auth.FirebaseAuth
 import androidx.compose.ui.platform.LocalContext
-import com.example.tfgapplibros.data.Libro
+import com.example.tfgapplibros.LibroScreen
+import com.example.tfgapplibros.components.CartaLibroPerfil
+import com.example.tfgapplibros.data.LibroPaginacion
 import com.example.tfgapplibros.model.PrincipalVIewModel
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 
 @Composable
 fun Principal(
@@ -77,13 +84,15 @@ fun Principal(
     val currentUser = firebaseAuth.currentUser
     val currentUserId: String? = currentUser?.uid
     val libros by viewModel.libros.observeAsState(initial = emptyList())
-    val listState = rememberLazyListState()
+
+
     LaunchedEffect(Unit) {
         Log.d("Librooooos",currentUserId?:"")
         viewModel.recogerLibros(currentUserId ?: "")
     }
+
     Scaffold(
-        topBar = { TopBarPrincipal(navController,userId) }, content = { PaginaPrincipal(it,userId, libros, viewModel) }
+        topBar = { TopBarPrincipal(navController,userId) }, content = { PaginaPrincipal(it,userId, libros, viewModel, navController) }
     )
 }
 
@@ -92,13 +101,12 @@ fun Principal(
 fun TopBarPrincipal(
     navController: NavHostController,
     userId: String?
-
 ) {
-
-    val viewModel = viewModel<BusquedaViewModel>()
-    val searchText by viewModel.searchText.collectAsState()
-    val libro by viewModel.libro.collectAsState()
-    val isSearching by viewModel.isSearching.collectAsState()
+//
+//    val viewModel = viewModel<BusquedaViewModel>()
+//    val searchText by viewModel.searchText.collectAsState()
+//    val libro by viewModel.libro.collectAsState()
+//    val isSearching by viewModel.isSearching.collectAsState()
 
     Column(modifier = Modifier.fillMaxSize()) {
         TopAppBar(
@@ -132,41 +140,41 @@ fun TopBarPrincipal(
                 }
             }
         )
-        TextField(value = searchText,
-            onValueChange = viewModel::onSearchTextChange,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp)
-                .shadow(
-                    elevation = 5.dp,
-                    spotColor = Color.DarkGray,
-                    shape = RoundedCornerShape(10.dp)
-                ),
-            placeholder = { Text(text = "Busqueda") }
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-        if (isSearching) {
-            Box(modifier = Modifier.fillMaxSize()){
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            ) {
-                items(libro) { Libro ->
-                    Text(
-                        text = "${Libro.titulo}",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 16.dp)
-                    )
-                }
-            }
-
-        }
+//        TextField(value = searchText,
+//            onValueChange = viewModel::onSearchTextChange,
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(10.dp)
+//                .shadow(
+//                    elevation = 5.dp,
+//                    spotColor = Color.DarkGray,
+//                    shape = RoundedCornerShape(10.dp)
+//                ),
+//            placeholder = { Text(text = "Busqueda") }
+//        )
+//
+//        Spacer(modifier = Modifier.height(16.dp))
+//        if (isSearching) {
+//            Box(modifier = Modifier.fillMaxSize()){
+//                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+//            }
+//        } else {
+//            LazyColumn(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .weight(1f)
+//            ) {
+//                items(libro) { Libro ->
+//                    Text(
+//                        text = "${Libro.titulo}",
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(vertical = 16.dp)
+//                    )
+//                }
+//            }
+//
+//        }
     }
 }
 
@@ -174,17 +182,34 @@ fun TopBarPrincipal(
 fun PaginaPrincipal(
     it: PaddingValues,
     userId: String?,
-    libros: List<Libro>,
-    viewModel: PrincipalVIewModel
+    libros: List<LibroPaginacion>,
+    viewModel: PrincipalVIewModel,
+    navController: NavHostController
 ) {
+    val listState = rememberLazyListState()
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo}
+            .map {
+                it.lastOrNull()?.index == listState.layoutInfo.totalItemsCount - 1
+            }
+            .distinctUntilChanged()
+            .collect { esFin ->
+                if (esFin) {
+                    viewModel.recogerLibros(userId ?: "")
+                }
+            }
+    }
+
     LazyColumn(
+        state = listState,
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp)
+        contentPadding = PaddingValues(16.dp),
     ) {
-        items(libros) { libro ->
-            Log.d("Librooooos", libro.toString())
-            //Text(text = libro.titulo)
-            MyCard(libro.titulo,libro.autor, null)
+        items(libros) { libroPag ->
+            val libro = libroPag.libro
+            CartaLibroPerfil(libro = libro) {
+               navController.navigate(LibroScreen(userId = libro.userId, libroId = libro.libroId))
+            }
             Spacer(modifier = Modifier.height(16.dp))
         }
         item {
