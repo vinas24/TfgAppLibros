@@ -698,7 +698,7 @@ fun RegistrationScreenPart2(navController: NavHostController, viewModel: Registe
                     enabled = camposRellenos
                 )
                 {
-                    viewModel.registerUser() {
+                    viewModel.registerUser {
                         Toast.makeText(context, "Registro exitoso", Toast.LENGTH_LONG).show()
                         navController.navigate(
                             PrincipalScreen

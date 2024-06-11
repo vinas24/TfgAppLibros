@@ -200,12 +200,12 @@ fun DatosPerfil(
                 }
             }
             Spacer(modifier = Modifier.width(16.dp))
-            /*Biografia(
+            Biografia(
                 datosUser = datosUser,
                 modifier = Modifier
                     .weight(7f)
                     .padding(end = 12.dp)
-            )*/
+            )
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -247,7 +247,7 @@ fun DatosPerfil(
     }
 
 }
-/*
+
 @Composable
 fun Biografia(
     datosUser: Usuario?,
@@ -271,7 +271,7 @@ fun Biografia(
 
     }
 }
-*/
+
 @Composable
 fun MisLibros(
     navController: NavHostController,

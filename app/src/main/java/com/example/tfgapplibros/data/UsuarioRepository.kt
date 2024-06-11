@@ -113,7 +113,7 @@ class UsuarioRepository {
     }
 
 
-    //TODO: Esto se realizará en un futuro hopefuully
+    //TODO: Esto se realizará en un futuro hopefully
 //    fun actualizarUsuario(
 //        idUsuario: String,
 //        usuario: Usuario,
