@@ -20,13 +20,17 @@ import com.example.tfgapplibros.views.RegisterUser
 import com.google.firebase.FirebaseApp
 import kotlinx.serialization.Serializable
 import android.content.SharedPreferences
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
 class MainActivity : ComponentActivity() {
     private lateinit var sharedPreferences: SharedPreferences
     override fun onCreate(savedInstanceState: Bundle?) {
-        FirebaseApp.initializeApp(this)
         super.onCreate(savedInstanceState)
+        installSplashScreen()
         enableEdgeToEdge()
+
+
+        FirebaseApp.initializeApp(this)
         sharedPreferences = getSharedPreferences("user_data", Context.MODE_PRIVATE)
         setContent {
             TfgAppLibrosTheme {

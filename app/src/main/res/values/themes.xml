@@ -2,4 +2,10 @@
 <resources>
 
     <style name="Theme.TfgAppLibros" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.MySplashScreen" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/primary_dark</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.TfgAppLibros</item>
+    </style>
 </resources>
