@@ -10,6 +10,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
+import okhttp3.internal.wait
 
 class UsuarioRepository {
     private val db = FirebaseFirestore.getInstance()
@@ -71,10 +72,8 @@ class UsuarioRepository {
                 .get()
                 .await()
             if (document.exists()) {
-                var user = document.toObject(Usuario::class.java)
-                Log.d("userrrrrr", user.toString())
+                val user = document.toObject(Usuario::class.java)
                 user
-
             } else {
                 null
             }
@@ -84,30 +83,54 @@ class UsuarioRepository {
         }
     }
 
-    fun libroLike(currentUser: String, libro: Libro, success: () -> Unit) {
-        
-        val likedRef = db
+    suspend fun libroLike(currentUser: String, libro: Libro, success: () -> Unit) {
+        val interesRes = db
             .collection("usuarios")
+            .document(libro.userId)
+            .collection("interesados")
+        val likedRef = db
+                .collection("usuarios")
             .document(currentUser)
             .collection("favoritos")
 
-        likedRef.document(libro.libroId).set(libro)
-            .addOnSuccessListener { 
-                success()
-            }.addOnFailureListener{
+        interesRes.document(currentUser).set(obtenerUsuarioPorId(currentUser)!!)
+            .addOnSuccessListener {
+                likedRef.document(libro.libroId).set(libro)
+                    .addOnSuccessListener {
+                        success()
+                    }.addOnFailureListener{
+                        Log.d("errorLike", it.toString())
+                    }
+            }
+            .addOnFailureListener {
                 Log.d("errorLike", it.toString())
             }
+
+
+
     }
 
     fun borrarLibroLike(currentUser: String, libro: Libro, success: () -> Unit) {
+        val interesRes = db
+            .collection("usuarios")
+            .document(libro.userId)
+            .collection("interesados")
+
         val likedRef = db
             .collection("usuarios")
             .document(currentUser)
             .collection("favoritos")
-        likedRef.document(libro.libroId).delete()
+
+        interesRes.document(currentUser).delete()
             .addOnSuccessListener {
-                success()
-            }.addOnFailureListener {
+                likedRef.document(libro.libroId).delete()
+                    .addOnSuccessListener {
+                        success()
+                    }.addOnFailureListener {
+                        Log.d("errorLike", it.toString())
+                    }
+            }
+            .addOnFailureListener {
                 Log.d("errorLike", it.toString())
             }
     }

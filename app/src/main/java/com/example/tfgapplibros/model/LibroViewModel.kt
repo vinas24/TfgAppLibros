@@ -28,23 +28,26 @@ class LibroViewModel : ViewModel() {
     val liked: LiveData<Boolean> = _liked
 
     fun likeChange(libro: Libro, onComplete: (String) -> Unit) {
-        val currentUser = Autentificacion.usuarioActualUid
-        if (currentUser != null) {
-            if (_liked.value == false) {
-                _liked.value = true
-                usuarioRepo.libroLike(currentUser,libro) {
-                    onComplete("Libro agregado a favoritos")
-                }
-            } else {
-                _liked.value = false
-                usuarioRepo.borrarLibroLike(currentUser,libro) {
-                    onComplete("Libro borrado de favoritos")
+        viewModelScope.launch {
+            val currentUser = Autentificacion.usuarioActualUid
+            if (currentUser != null) {
+                if (_liked.value == false) {
+                    _liked.value = true
+                    usuarioRepo.libroLike(currentUser, libro) {
+                        onComplete("Libro agregado a favoritos")
+                    }
+                } else {
+                    _liked.value = false
+                    usuarioRepo.borrarLibroLike(currentUser, libro) {
+                        onComplete("Libro borrado de favoritos")
+                    }
                 }
             }
         }
     }
 
     fun checkLiked(libroId: String) {
+
         val currentUser = Autentificacion.usuarioActualUid
         if (currentUser != null) {
             usuarioRepo.esFavorito(currentUser,libroId) { esFav ->

@@ -65,9 +65,11 @@ import com.example.tfgapplibros.PrincipalScreen
 import com.example.tfgapplibros.R
 import com.example.tfgapplibros.components.CajaGenero
 import com.example.tfgapplibros.components.CartaLibroPerfil
+import com.example.tfgapplibros.components.acortarTxt
 import com.example.tfgapplibros.components.getColorFromResource
 import com.example.tfgapplibros.data.Libro
 import com.example.tfgapplibros.data.Usuario
+import com.example.tfgapplibros.model.Autentificacion
 import com.example.tfgapplibros.model.PerfilViewModel
 
 
@@ -77,11 +79,18 @@ fun Perfil(
     navController: NavHostController,
     userId: String
 ) {
+    val esMio = Autentificacion.usuarioActualUid == userId
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 //TODO: cambiar el titulo dependiendo si es o no es el perfil de nuestro usuario
-                title = { Text("Mi Perfil") },
+                title = {
+                    if(esMio) {
+                        Text("Mi Perfil")
+                    } else {
+                        Text(text = "Su Perfil")
+                    }
+                        },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = getColorFromResource(colorResId = R.color.primary_dark),
                     titleContentColor = Color.White
@@ -118,7 +127,7 @@ fun Perfil(
             }
         }
     ) {
-        Contenido(it = it, navController = navController, userId = userId);
+        Contenido(it = it, navController = navController, userId = userId, esMio = esMio);
     }
 }
 
@@ -127,6 +136,7 @@ fun Contenido(
     it: PaddingValues,
     navController: NavHostController,
     userId: String,
+    esMio: Boolean
 ) {
     val viewModel: PerfilViewModel = viewModel()
     val libros by viewModel.libros.collectAsState()
@@ -147,7 +157,7 @@ fun Contenido(
     ) {
         Divider(thickness = 2.dp, color = Color.Gray)
         DatosPerfil(datosUser)
-        Libros(navController, libros, favoritos)
+        Libros(navController,esMio, libros, favoritos)
     }
 }
 
@@ -260,7 +270,7 @@ fun Biografia(
         Text(text = "${datosUser?.ciudad?:"..."}, ${datosUser?.pais?:"..."}", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "texto provisional, deberia ser una bio : ${datosUser?.biografia?:"....."}",
+            text = datosUser?.biografia?:".....".acortarTxt(100),
             fontSize = 16.sp,
             lineHeight = 18.sp,
             color = Color.White
@@ -272,6 +282,7 @@ fun Biografia(
 @Composable
 fun Libros(
     navController: NavHostController,
+    esMio: Boolean,
     libros: List<Libro>,
     favoritos: List<Libro>
 ) {
@@ -295,16 +306,26 @@ fun Libros(
         ) {
             Tab(selected = selectedTabIndex == 0,
                 onClick = { selectedTabIndex = 0 },
-                text = { Text(text = "Mis libros", color = Color.Black)},
-                selectedContentColor = getColorFromResource(colorResId = R.color.secondary_dark),
+                text = {
+                    if (esMio) {
+                        Text(text = "Mis libros", color = Color.Black)
+                    } else {
+                        Text(text = "Sus libros", color = Color.Black)
+
+                    }
+                       },
+                selectedContentColor = Color.Gray,
                 modifier = Modifier.background(getColorFromResource(colorResId = R.color.background_dark))
             )
-            Tab(selected = selectedTabIndex == 1,
-                onClick = { selectedTabIndex = 1 },
-                text = { Text(text = "Favoritos", color = Color.Black)},
-                selectedContentColor = getColorFromResource(colorResId = R.color.secondary_dark),
-                modifier = Modifier.background(getColorFromResource(colorResId = R.color.background_dark))
-            )
+            if(esMio) {
+                Tab(
+                    selected = selectedTabIndex == 1,
+                    onClick = { selectedTabIndex = 1 },
+                    text = { Text(text = "Favoritos", color = Color.Black) },
+                    selectedContentColor = Color.Gray,
+                    modifier = Modifier.background(getColorFromResource(colorResId = R.color.background_dark))
+                )
+            }
         }
         when (selectedTabIndex) {
             0 -> MisLibros(libros, navController)
