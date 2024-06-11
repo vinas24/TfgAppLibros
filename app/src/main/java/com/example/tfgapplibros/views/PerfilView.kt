@@ -263,7 +263,7 @@ fun Biografia(
         Text(text = "${datosUser?.ciudad?:"..."}, ${datosUser?.pais?:"..."}", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "texto provisional, deberia ser una bio : ${datosUser?.direccion?:"....."}",
+            text = "texto provisional, deberia ser una bio : ${datosUser?.biografia?:"....."}",
             fontSize = 16.sp,
             lineHeight = 18.sp,
             color = Color.White
