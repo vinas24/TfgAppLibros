@@ -4,9 +4,11 @@ import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -194,12 +196,11 @@ fun PaginaPrincipal(
             }
             .distinctUntilChanged()
             .collect { esFin ->
-                if (esFin) {
+                if (esFin && !viewModel.loading && !viewModel.endOfListReached) {
                     viewModel.recogerLibros(userId ?: "")
                 }
             }
     }
-
     LazyColumn(
         state = listState,
         modifier = Modifier.fillMaxSize(),
@@ -214,7 +215,12 @@ fun PaginaPrincipal(
         }
         item {
             if (viewModel.loading)
-                CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
+                    CircularProgressIndicator(modifier = Modifier.padding(16.dp), color = getColorFromResource(
+                        colorResId = R.color.secondary_dark
+                    ))
+                    
+                }
         }
     }
 }
