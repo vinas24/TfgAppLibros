@@ -66,7 +66,7 @@ class LibroRepository {
         val imgRef = storage.reference.child("libros/$libroId.jpg")
         imgRef.delete()
             .addOnSuccessListener {
-                //Esta uri esta mal
+                //Hay un problema cuando la URI es la misma
                 //ª q bn
                 imgRef.putFile(imgUri)
                     .addOnSuccessListener {
@@ -126,19 +126,24 @@ class LibroRepository {
         val librosLiveData = MutableLiveData<List<LibroPaginacion>>()
         val librosCollection = db.collectionGroup("libros")
 
-        //librosCollection.whereNotEqualTo("userId", excludeId).get()
-            var query =  librosCollection.limit(limit)
-                lastDocumentSnapshot?.let {
-                    query = query.startAfter(it)
-                }
-            query.get().addOnSuccessListener { querySnapshot ->
+        var query = librosCollection.whereNotEqualTo("userId", excludeId).limit(limit)
+//        var query =  librosCollection.limit(limit)
+
+        lastDocumentSnapshot?.let {
+            query = query.startAfter(it)
+        }
+
+        query.get().addOnSuccessListener { querySnapshot ->
+
             val libros = querySnapshot.documents.mapNotNull {docSnapshot ->
                 val libro = docSnapshot.toObject(Libro::class.java)
+
                 libro?.let { LibroPaginacion(it, docSnapshot) }
             }
             librosLiveData.value = libros
+
         }.addOnFailureListener {
-            //TODO: Que hacer en caso de error
+            Log.d("Librooo",it.toString())
         }
         return librosLiveData
     }
