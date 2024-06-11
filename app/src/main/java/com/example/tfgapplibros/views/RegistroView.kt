@@ -123,16 +123,14 @@ fun RegistrarUsuarioView(
 
     val context = LocalContext.current
 
-    val nombre by viewModel.nombre.observeAsState("")
-    val apellidos by viewModel.apellidos.observeAsState("")
     val nombreUsuario by viewModel.nombreUsuario.observeAsState("")
     val contrasena by viewModel.contrasena.observeAsState("")
-    val edad by viewModel.edad.observeAsState("")
     val correo by viewModel.correo.observeAsState("")
-    val direccion by viewModel.direccion.observeAsState("")
+    val nombre by viewModel.nombre.observeAsState("")
+    val apellidos by viewModel.apellidos.observeAsState("")
+    val biografia by viewModel.biografia.observeAsState("")
     val ciudad by viewModel.ciudad.observeAsState("")
     val pais by viewModel.pais.observeAsState("")
-    val codigoPostal by viewModel.codigoPostal.observeAsState("")
     val numeroTelefono by viewModel.numeroTelefono.observeAsState("")
     val fotoPerfil by viewModel.fotoPerfil.observeAsState()
 
@@ -147,9 +145,8 @@ fun RegistrarUsuarioView(
         onResult = { uri -> uri?.let { viewModel.fotoPerfilChange(uri) } }
     )
     val camposRellenos =
-        nombre.isNotEmpty() && apellidos.isNotEmpty() && nombreUsuario.isNotEmpty() && contrasena.isNotEmpty() && edad != 0
-                && correo.isNotBlank() && direccion.isNotEmpty() && pais.isNotEmpty() && ciudad.isNotEmpty() && codigoPostal != 0
-                && numeroTelefono != 0
+        nombreUsuario.isNotEmpty() && contrasena.isNotEmpty() && correo.isNotBlank() && nombre.isNotEmpty() &&
+        apellidos.isNotEmpty() && biografia.isNotEmpty() && pais.isNotEmpty() && ciudad.isNotEmpty() && numeroTelefono != 0
 
     val commonModifier =
         Modifier
@@ -235,29 +232,6 @@ fun RegistrarUsuarioView(
                 modifier = commonModifier
             )
             Spacer(modifier = Modifier.height(16.dp))
-            //TODO: cambiar a tipo string y que el check se haga en el VM
-            CampoTexto(
-                text = edad.toString(),
-                onTextChanged = { viewModel.edadChange(it.toInt()) },
-                label = "Edad",
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done
-                ),
-                modifier = commonModifier
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            CampoTexto(
-                text = direccion,
-                onTextChanged = { viewModel.direccionChange(it) },
-                label = "Direccion",
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done
-                ),
-                modifier = commonModifier
-            )
-            Spacer(modifier = Modifier.height(16.dp))
             CampoTexto(
                 text = ciudad,
                 onTextChanged = { viewModel.ciudadChange(it) },
@@ -273,17 +247,6 @@ fun RegistrarUsuarioView(
                 text = pais,
                 onTextChanged = { viewModel.paisChange(it) },
                 label = "País",
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done
-                ),
-                modifier = commonModifier
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            CampoTexto(
-                text = codigoPostal.toString(),
-                onTextChanged = { viewModel.codigoPostalChange(it.toInt()) },
-                label = "Código postal",
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done

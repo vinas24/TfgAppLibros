@@ -23,35 +23,29 @@ class RegisterViewModel : ViewModel() {
 
     private val usuarioRepository = UsuarioRepository()
 
-    private val _nombre = MutableLiveData<String>()
-    val nombre: LiveData<String> = _nombre
-
-    private val _apellidos = MutableLiveData<String>()
-    val apellidos: LiveData<String> = _apellidos
-
     private val _nombreUsuario = MutableLiveData<String>()
     val nombreUsuario: LiveData<String> = _nombreUsuario
 
     private val _contrasena = MutableLiveData<String>()
     val contrasena: LiveData<String> = _contrasena
 
-    private val _edad = MutableLiveData<Int>()
-    val edad: LiveData<Int> = _edad
-
     private val _correo = MutableLiveData<String>()
     val correo: LiveData<String> = _correo
 
-    private val _direccion = MutableLiveData<String>()
-    val direccion: LiveData<String> = _direccion
+    private val _nombre = MutableLiveData<String>()
+    val nombre: LiveData<String> = _nombre
+
+    private val _apellidos = MutableLiveData<String>()
+    val apellidos: LiveData<String> = _apellidos
+
+    private val _biografia = MutableLiveData<String>()
+    val biografia: LiveData<String> = _biografia
 
     private val _pais = MutableLiveData<String>()
     val pais: LiveData<String> = _pais
 
     private val _ciudad = MutableLiveData<String>()
     val ciudad: LiveData<String> = _ciudad
-
-    private val _codigoPostal = MutableLiveData<Int>()
-    val codigoPostal: LiveData<Int> = _codigoPostal
 
     private val _numeroTelefono = MutableLiveData<Int>()
     val numeroTelefono: LiveData<Int> = _numeroTelefono
@@ -72,14 +66,6 @@ class RegisterViewModel : ViewModel() {
 
     val loading get() = _loading.value
 
-    fun nombreChange(newNombre : String) {
-        _nombre.value = newNombre
-    }
-
-    fun apellidosChange(newApellidos : String) {
-        _apellidos.value = newApellidos
-    }
-
     fun nombreUsuarioChange(newNombreUsuario : String) {
         _nombreUsuario.value = newNombreUsuario
     }
@@ -88,16 +74,20 @@ class RegisterViewModel : ViewModel() {
         _contrasena.value = newContrasena
     }
 
-    fun edadChange(newEdad : Int) {
-        _edad.value = newEdad
-    }
-
     fun correoChange(newCorreo : String){
         _correo.value = newCorreo
     }
 
-    fun direccionChange(newDireccion : String){
-        _direccion.value = newDireccion
+    fun nombreChange(newNombre : String) {
+        _nombre.value = newNombre
+    }
+
+    fun apellidosChange(newApellidos : String) {
+        _apellidos.value = newApellidos
+    }
+
+    fun biografiaChange(newBiografia : String){
+        _biografia.value = newBiografia
     }
 
     fun ciudadChange(newCiudad : String){
@@ -106,10 +96,6 @@ class RegisterViewModel : ViewModel() {
 
     fun paisChange(newPais : String){
         _pais.value = newPais
-    }
-
-    fun codigoPostalChange(newCodigoPostal : Int){
-        _codigoPostal.value = newCodigoPostal
     }
 
     fun numeroTelefonoChange(newNumeroTelefono : Int){
@@ -128,38 +114,34 @@ class RegisterViewModel : ViewModel() {
 
     fun registerUser(perfil: () -> Unit) {
         _loading.value=true
-        val nombre = _nombre.value.orEmpty()
-        val apellidos = _apellidos.value.orEmpty()
         val nombreUsuario = _nombreUsuario.value.orEmpty()
         val contrasena = _contrasena.value.orEmpty()
-        val edad = _edad.value ?:1
         val correo = _correo.value.orEmpty()
-        val direccion = _direccion.value.orEmpty()
+        val nombre = _nombre.value.orEmpty()
+        val apellidos = _apellidos.value.orEmpty()
+        val biografia = _biografia.value.orEmpty()
         val pais = _pais.value.orEmpty()
         val ciudad = _ciudad.value.orEmpty()
-        val codigoPostal = _codigoPostal.value ?:1
         val numeroTelefono = _numeroTelefono.value ?:1
         val generos = _generos.value?: emptyList()
         val fotoPerfil = _fotoPerfil.value
 
-        if (nombre.isBlank() || apellidos.isBlank() || nombreUsuario.isBlank() || contrasena.isBlank() || edad == 0 || correo.isBlank()
-            || direccion.isBlank() || pais.isBlank() || ciudad.isBlank() || codigoPostal == 0 || numeroTelefono == 0 || generos.isEmpty()
+        if (nombreUsuario.isBlank() || contrasena.isBlank() || correo.isBlank() || nombre.isBlank() || apellidos.isBlank()
+            ||biografia.isBlank() || pais.isBlank() || ciudad.isBlank() || numeroTelefono == 0 || generos.isEmpty()
             || fotoPerfil == null) {
             _mensError.value = "Rellena todos los campos"
             return
         }
 
         val usuario = Usuario(
-            nombre = nombre,
-            apellidos = apellidos,
             nombreUsuario = nombreUsuario,
             contrasena = contrasena,
-            edad = edad,
             correo = correo,
-            direccion = direccion,
+            nombre = nombre,
+            apellidos = apellidos,
+            biografia = biografia,
             pais = pais,
             ciudad = ciudad,
-            codigoPostal = codigoPostal,
             generos = generos,
             numeroTelefono = numeroTelefono
         )
