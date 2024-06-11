@@ -113,3 +113,4 @@ fun getColorFromResource(colorResId: Int): Color {
     val context = LocalContext.current
     return Color(ContextCompat.getColor(context, colorResId))
 }
+

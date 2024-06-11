@@ -21,6 +21,13 @@ class PrincipalVIewModel: ViewModel() {
     var loading = false
     var endOfListReached = false
 
+    private val _search = MutableLiveData<String>("")
+    val search: LiveData<String> = _search
+
+    fun changesearch(string: String) {
+        _search.value = string
+    }
+
     fun recogerLibros(excludeId: String) {
         if (loading || endOfListReached) return
 

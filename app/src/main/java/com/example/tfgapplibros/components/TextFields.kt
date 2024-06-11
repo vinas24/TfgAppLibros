@@ -10,12 +10,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,20 +34,31 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.DefaultAlpha
+import androidx.compose.ui.graphics.DefaultShadowColor
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.Typeface
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.tfgapplibros.R
+import com.google.firebase.database.Query
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun CampoTexto(
@@ -57,8 +73,8 @@ fun CampoTexto(
     val colorBack = getColorFromResource(colorResId = R.color.background_light)
 
     val customTextSelectionColors = TextSelectionColors(
-        handleColor = colorPrim2,
-        backgroundColor = colorPrim2
+        handleColor = colorPrim,
+        backgroundColor = Color.LightGray
     )
     CompositionLocalProvider(
         LocalTextSelectionColors provides customTextSelectionColors
@@ -103,8 +119,8 @@ fun CampoUsuarioLogin(
     val colorBack2 = getColorFromResource(colorResId = R.color.secondary)
 
     val customTextSelectionColors = TextSelectionColors(
-        handleColor = colorPrim2,
-        backgroundColor = colorPrim2
+        handleColor = colorPrim,
+        backgroundColor = Color.LightGray
     )
     CompositionLocalProvider(
         LocalTextSelectionColors provides customTextSelectionColors
@@ -148,8 +164,8 @@ fun CampoTextoLargo(
     val colorBack = getColorFromResource(colorResId = R.color.background_light)
 
     val customTextSelectionColors = TextSelectionColors(
-        handleColor = colorPrim2,
-        backgroundColor = colorPrim2
+        handleColor = colorPrim,
+        backgroundColor = Color.LightGray
     )
     CompositionLocalProvider(
         LocalTextSelectionColors provides customTextSelectionColors
@@ -201,8 +217,8 @@ fun CampoContrasenaLogin(
     val colorBack2 = getColorFromResource(colorResId = R.color.secondary)
 
     val customTextSelectionColors = TextSelectionColors(
-        handleColor = colorPrim2,
-        backgroundColor = colorPrim2
+        handleColor = colorPrim,
+        backgroundColor = Color.LightGray
     )
     CompositionLocalProvider(
         LocalTextSelectionColors provides customTextSelectionColors
@@ -257,7 +273,7 @@ fun CampoContrasenaRegister(
 
     val customTextSelectionColors = TextSelectionColors(
         handleColor = colorPrim2,
-        backgroundColor = colorPrim2
+        backgroundColor = Color.Gray
     )
     CompositionLocalProvider(
         LocalTextSelectionColors provides customTextSelectionColors
@@ -378,5 +394,63 @@ fun VerCampos() {
     }
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MySearchBar(
+    modifier: Modifier = Modifier,
+    placeholder: String = "Search...",
+    Result: (String) -> Unit = {}
+) {
+    val searchTextState = remember { mutableStateOf(TextFieldValue("")) }
+    var searchJob by remember { mutableStateOf<Job?>(null) }
+    val coroutineScope = rememberCoroutineScope()
+
+    val customTextSelectionColors = TextSelectionColors(
+        handleColor = getColorFromResource(colorResId = R.color.primary),
+        backgroundColor = Color.LightGray
+    )
+    CompositionLocalProvider(
+        LocalTextSelectionColors provides customTextSelectionColors
+    ) {
+    OutlinedTextField(
+        value = searchTextState.value,
+        onValueChange = { value ->
+            searchTextState.value = value
+            if (value.text.isBlank()) {
+                Result(searchTextState.value.text)
+            }
+        },
+        modifier = modifier
+            .fillMaxWidth()
+            .background(Color.White, shape = CircleShape)
+            .padding(4.dp),
+        placeholder = { Text(text = placeholder) },
+        leadingIcon = {
+            IconButton(onClick = { Result(searchTextState.value.text)}) {
+
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search Icon",
+                    tint = Color.Gray
+                )
+            }
+
+        },
+        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
+        keyboardActions = KeyboardActions(onSearch = { Result(searchTextState.value.text)}),
+        shape = CircleShape,
+        singleLine = true,
+        textStyle = TextStyle(fontSize = 18.sp),
+        colors = TextFieldDefaults.colors(
+            unfocusedContainerColor = Color.White,
+            focusedContainerColor = Color.White,
+            focusedIndicatorColor = getColorFromResource(colorResId = R.color.primary),
+           cursorColor = getColorFromResource(colorResId = R.color.primary),
+            focusedTextColor = Color.Gray
+        )
+    )
+    }
+}
 
 
