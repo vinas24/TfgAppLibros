@@ -47,6 +47,7 @@ import androidx.navigation.NavHostController
 import com.example.tfgapplibros.AddLibroScreen
 import com.example.tfgapplibros.PerfilScreen
 import com.example.tfgapplibros.R
+import com.example.tfgapplibros.components.CajaGenero
 import com.example.tfgapplibros.components.ImagenConLikeButton
 import com.example.tfgapplibros.components.RatingStar
 import com.example.tfgapplibros.components.acortarTxt

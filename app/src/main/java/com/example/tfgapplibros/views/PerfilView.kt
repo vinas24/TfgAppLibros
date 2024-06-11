@@ -23,13 +23,9 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
@@ -37,45 +33,43 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import coil.size.Size
 import com.example.tfgapplibros.AddLibroScreen
 import com.example.tfgapplibros.LibroScreen
 import com.example.tfgapplibros.PrincipalScreen
 import com.example.tfgapplibros.R
+import com.example.tfgapplibros.components.CajaGenero
 import com.example.tfgapplibros.components.CartaLibroPerfil
 import com.example.tfgapplibros.components.getColorFromResource
-import com.example.tfgapplibros.components.toColor
 import com.example.tfgapplibros.data.Libro
 import com.example.tfgapplibros.data.Usuario
 import com.example.tfgapplibros.model.PerfilViewModel
 
-
-val generos = listOf("Ficción", "Fantasía", "Misterio")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -136,11 +130,14 @@ fun Contenido(
 ) {
     val viewModel: PerfilViewModel = viewModel()
     val libros by viewModel.libros.collectAsState()
+    val favoritos by viewModel.favoritos.collectAsState()
     val datosUser by viewModel.datosUser.collectAsState()
+
 
     LaunchedEffect(userId) {
         viewModel.obtenerLibros(userId = userId)
         viewModel.cargarPerfil(userId)
+        viewModel.obtenerFavoritos(userId = userId)
     }
     Column(
         modifier = Modifier
@@ -150,7 +147,7 @@ fun Contenido(
     ) {
         Divider(thickness = 2.dp, color = Color.Gray)
         DatosPerfil(datosUser)
-        MisLibros(navController, libros)
+        Libros(navController, libros, favoritos)
     }
 }
 
@@ -273,50 +270,97 @@ fun Biografia(
 }
 
 @Composable
-fun MisLibros(
+fun Libros(
     navController: NavHostController,
-    libros: List<Libro>
+    libros: List<Libro>,
+    favoritos: List<Libro>
 ) {
+    var selectedTabIndex by remember { mutableStateOf(0) }
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.Start
     ) {
         Divider(color = Color.Gray)
-        Row(
-            modifier = Modifier
-                .background(color = getColorFromResource(colorResId = R.color.background_dark))
-                .fillMaxWidth()
-        ) {
-            Text(
-                text = "Mis Libros:",
-                fontSize = 20.sp,
-                color = Color.Black,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-            )
-        }
-        Divider(color = Color.Gray)
-
-        LazyVerticalStaggeredGrid(
-            columns = StaggeredGridCells.Adaptive(minSize = 178.dp),
-            modifier = Modifier
-                .background(color = getColorFromResource(colorResId = R.color.background_light))
-                .fillMaxSize()
-        ) {
-            items(libros) { libro ->
-                CartaLibroPerfil(libro = libro) {
-                    navController.navigate(
-                        LibroScreen(
-                            userId = libro.userId,
-                            libroId = libro.libroId
-                        )
-                    )
-                }
-
+        TabRow(
+            selectedTabIndex = selectedTabIndex,
+            modifier = Modifier,
+            indicator = {
+                TabRowDefaults.Indicator(
+                    Modifier.tabIndicatorOffset(it[selectedTabIndex]),
+                    color = getColorFromResource(colorResId = R.color.secondary_dark)
+                )
             }
 
+        ) {
+            Tab(selected = selectedTabIndex == 0,
+                onClick = { selectedTabIndex = 0 },
+                text = { Text(text = "Mis libros", color = Color.Black)},
+                selectedContentColor = getColorFromResource(colorResId = R.color.secondary_dark),
+                modifier = Modifier.background(getColorFromResource(colorResId = R.color.background_dark))
+            )
+            Tab(selected = selectedTabIndex == 1,
+                onClick = { selectedTabIndex = 1 },
+                text = { Text(text = "Favoritos", color = Color.Black)},
+                selectedContentColor = getColorFromResource(colorResId = R.color.secondary_dark),
+                modifier = Modifier.background(getColorFromResource(colorResId = R.color.background_dark))
+            )
+        }
+        when (selectedTabIndex) {
+            0 -> MisLibros(libros, navController)
+            1 -> Favoritos(favoritos, navController)
         }
     }
 }
+
+@Composable
+fun MisLibros(libros: List<Libro>, navController: NavHostController) {
+    LazyVerticalStaggeredGrid(
+        columns = StaggeredGridCells.Adaptive(minSize = 178.dp),
+        modifier = Modifier
+            .background(color = getColorFromResource(colorResId = R.color.background_light))
+            .fillMaxSize()
+    ) {
+        items(libros) { libro ->
+            CartaLibroPerfil(libro = libro) {
+                navController.navigate(
+                    LibroScreen(
+                        userId = libro.userId,
+                        libroId = libro.libroId
+                    )
+                )
+            }
+
+        }
+
+    }
+}
+
+@Composable
+fun Favoritos(favoritos:List<Libro>,navController: NavHostController) {
+    LazyVerticalStaggeredGrid(
+        columns = StaggeredGridCells.Adaptive(minSize = 178.dp),
+        modifier = Modifier
+            .background(color = getColorFromResource(colorResId = R.color.background_light))
+            .fillMaxSize()
+    ) {
+        items(favoritos) { libro ->
+            CartaLibroPerfil(libro = libro) {
+                navController.navigate(
+                    LibroScreen(
+                        userId = libro.userId,
+                        libroId = libro.libroId
+                    )
+                )
+            }
+
+        }
+
+    }
+}
+
+
+
 
 //TODO: Mover la imagen a Images.kt
 @Composable
@@ -339,28 +383,3 @@ fun ImagenRedonda(
     )
 }
 
-@Composable
-fun CajaGenero(
-    nombre: String,
-    fontsize: TextUnit
-) {
-    Surface(
-        modifier = Modifier
-            .padding(2.dp),
-        shape = RoundedCornerShape(25),
-        color = nombre.toColor()
-    ) {
-        Box(
-            modifier = Modifier
-                .padding(4.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = nombre,
-                color = Color.White,
-                fontSize = fontsize,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
-}

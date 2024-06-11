@@ -1,5 +1,6 @@
 package com.example.tfgapplibros.components
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -9,11 +10,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 
 import coil.compose.AsyncImage
@@ -71,6 +77,32 @@ fun CartaLibroPerfil(
             }
 
 
+        }
+    }
+}
+
+@Composable
+fun CajaGenero(
+    nombre: String,
+    fontsize: TextUnit
+) {
+    Surface(
+        modifier = Modifier
+            .padding(2.dp),
+        shape = RoundedCornerShape(25),
+        color = nombre.toColor()
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(4.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = nombre,
+                color = Color.White,
+                fontSize = fontsize,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }

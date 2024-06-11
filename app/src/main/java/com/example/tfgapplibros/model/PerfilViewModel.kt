@@ -25,6 +25,9 @@ class PerfilViewModel() : ViewModel(){
     private val _libros = MutableStateFlow<List<Libro>>(emptyList())
     val libros: StateFlow<List<Libro>> = _libros
 
+    private val _favoritos = MutableStateFlow<List<Libro>>(emptyList())
+    val favoritos: StateFlow<List<Libro>> = _favoritos
+
     private val _datosUser = MutableStateFlow<Usuario?>(null)
 
     val datosUser: StateFlow<Usuario?> = _datosUser
@@ -35,6 +38,47 @@ class PerfilViewModel() : ViewModel(){
             _libros.value = libros
         }
     }
+    fun obtenerFavoritos(userId: String) {
+        viewModelScope.launch {
+            val favs = librosFavoritos(userId)
+            _favoritos.value = favs
+        }
+    }
+
+    private suspend fun librosFavoritos(userId: String): List<Libro> {
+        val db = FirebaseFirestore.getInstance()
+        val libros = mutableListOf<Libro>()
+        try {
+            val snapshot = db
+                .collection("usuarios")
+                .document(userId)
+                .collection("favoritos")
+                .get()
+                .await()
+
+            for (doc in snapshot.documents) {
+                val libro = doc.toObject(Libro::class.java)
+                if (libro != null) {
+                    libros.add(libro)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return libros
+    }
+
+
+    fun cargarPerfil(userId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+
+            val user = usuarioRepo.obtenerUsuarioPorId(userId)
+            if (user != null) {
+                _datosUser.value = user
+            }
+        }
+    }
+
 
     private suspend fun librosDelUsuario(userId: String): List<Libro> {
         val db = FirebaseFirestore.getInstance()
@@ -58,17 +102,6 @@ class PerfilViewModel() : ViewModel(){
             e.printStackTrace()
         }
         return libros
-    }
-
-
-    fun cargarPerfil(userId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-
-            val user = usuarioRepo.obtenerUsuarioPorId(userId)
-            if (user != null) {
-                _datosUser.value = user
-            }
-        }
     }
 
 }

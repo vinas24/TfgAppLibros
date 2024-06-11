@@ -89,7 +89,7 @@ class UsuarioRepository {
         val likedRef = db
             .collection("usuarios")
             .document(currentUser)
-            .collection("LibrosLiked")
+            .collection("favoritos")
 
         likedRef.document(libro.libroId).set(libro)
             .addOnSuccessListener { 
@@ -103,7 +103,7 @@ class UsuarioRepository {
         val likedRef = db
             .collection("usuarios")
             .document(currentUser)
-            .collection("LibrosLiked")
+            .collection("favoritos")
         likedRef.document(libro.libroId).delete()
             .addOnSuccessListener {
                 success()

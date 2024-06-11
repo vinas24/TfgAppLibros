@@ -124,7 +124,7 @@ fun AddLibroContenido(
     esEditando: Boolean,
     libroId: String?
 ) {
-    var listaGeneros = listOf("Ficción", "Fantasía", "Misterio", "Romance", "Histórica", "Poesía", "Infantil", "Juveníl", "Autoayuda", "Biográfica" )
+    var listaGeneros = listOf("Ficción", "Fantasía", "Misterio", "Romance", "Histórica", "Poesía", "Infantil", "Juveníl", "Autoayuda", "Terror" )
 
     val titulo by viewModel.titulo.observeAsState("")
     val autor by viewModel.autor.observeAsState("")
