@@ -126,8 +126,8 @@ class LibroRepository {
         val librosLiveData = MutableLiveData<List<LibroPaginacion>>()
         val librosCollection = db.collectionGroup("libros")
 
-        //librosCollection.whereNotEqualTo("userId", excludeId).get()
-        var query =  librosCollection.limit(limit)
+        var query = librosCollection.whereNotEqualTo("userId", excludeId).limit(limit)
+//        var query =  librosCollection.limit(limit)
 
         lastDocumentSnapshot?.let {
             query = query.startAfter(it)
@@ -137,12 +137,13 @@ class LibroRepository {
 
             val libros = querySnapshot.documents.mapNotNull {docSnapshot ->
                 val libro = docSnapshot.toObject(Libro::class.java)
+
                 libro?.let { LibroPaginacion(it, docSnapshot) }
             }
             librosLiveData.value = libros
 
         }.addOnFailureListener {
-            //TODO: Que hacer en caso de error
+            Log.d("Librooo",it.toString())
         }
         return librosLiveData
     }
