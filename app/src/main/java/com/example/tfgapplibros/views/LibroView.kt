@@ -1,6 +1,7 @@
 package com.example.tfgapplibros.views
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.background
 
 import androidx.compose.foundation.layout.Arrangement
@@ -33,10 +34,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -51,6 +54,7 @@ import com.example.tfgapplibros.components.getColorFromResource
 import com.example.tfgapplibros.data.Libro
 import com.example.tfgapplibros.model.Autentificacion
 import com.example.tfgapplibros.model.LibroViewModel
+import kotlinx.coroutines.launch
 
 
 @SuppressLint("UnrememberedMutableState")
@@ -74,6 +78,7 @@ fun LibroView(
     } else {
         //TODO: tocara hacer un mensaje de error o algo
     }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -106,6 +111,7 @@ fun ContenidoLibro(
                 actions = {
                     if (libro.userId == Autentificacion.usuarioActualUid) {
                         var expanded by remember { mutableStateOf(false) }
+
                         IconButton(
                             onClick = { expanded = true }
                         ) {
@@ -161,12 +167,25 @@ fun ContenidoLibro(
 
             ) {
             val liked = viewModel.liked.observeAsState(false)
+            val context = LocalContext.current
+            val courutineScope = rememberCoroutineScope()
+
+            fun mensaje(text: String){
+                courutineScope.launch {
+                    Toast.makeText(context,text,Toast.LENGTH_SHORT).show()
+                }
+            }
             //TODO: Pasar una accion Para que el action button solo salga si no es nuestro el libro
             ImagenConLikeButton(
                 libro = libro,
                 userId = userId ,
                 liked = liked.value
-            ) { viewModel.likeChange()}
+            ) {
+                viewModel.likeChange(libro){
+                    mensaje(text = it)
+                }
+            }
+
             Column(
                 modifier = Modifier.padding(
                     horizontal = 16.dp
@@ -214,4 +233,5 @@ fun ContenidoLibro(
     }
 
 }
+
 

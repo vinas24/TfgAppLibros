@@ -2,6 +2,7 @@ package com.example.tfgapplibros.data
 
 import android.net.Uri
 import android.util.Log
+import coil.compose.AsyncImagePainter
 import com.example.tfgapplibros.model.Autentificacion
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -61,6 +62,57 @@ class UsuarioRepository {
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { onFailure(it) }
     }
+   
+    suspend fun obtenerUsuarioPorId(idUsuario: String): Usuario? {
+        return try {
+            val document = db
+                .collection("usuarios")
+                .document(idUsuario)
+                .get()
+                .await()
+            if (document.exists()) {
+                var user = document.toObject(Usuario::class.java)
+                Log.d("userrrrrr", user.toString())
+                user
+
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    fun libroLike(currentUser: String, libro: Libro, success: () -> Unit) {
+        
+        val likedRef = db
+            .collection("usuarios")
+            .document(currentUser)
+            .collection("LibrosLiked")
+
+        likedRef.document(libro.libroId).set(libro)
+            .addOnSuccessListener { 
+                success()
+            }.addOnFailureListener{
+                Log.d("errorLike", it.toString())
+            }
+    }
+
+    fun borrarLibroLike(currentUser: String, libro: Libro, success: () -> Unit) {
+        val likedRef = db
+            .collection("usuarios")
+            .document(currentUser)
+            .collection("LibrosLiked")
+        likedRef.document(libro.libroId).delete()
+            .addOnSuccessListener {
+                success()
+            }.addOnFailureListener {
+                Log.d("errorLike", it.toString())
+            }
+    }
+
+
     //TODO: Esto se realizará en un futuro hopefuully
 //    fun actualizarUsuario(
 //        idUsuario: String,
@@ -85,26 +137,6 @@ class UsuarioRepository {
 //    }
 
 
-    suspend fun obtenerUsuarioPorId(idUsuario: String): Usuario? {
-        return try {
-            val document = db
-                .collection("usuarios")
-                .document(idUsuario)
-                .get()
-                .await()
-            if (document.exists()) {
-                var user = document.toObject(Usuario::class.java)
-                Log.d("userrrrrr", user.toString())
-                user
-
-            } else {
-                null
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
-    }
 
     //TODO: Posible extra si da tiempo
 //    fun borrarUsuario(

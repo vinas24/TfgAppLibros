@@ -7,11 +7,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tfgapplibros.data.Libro
 import com.example.tfgapplibros.data.LibroRepository
+import com.example.tfgapplibros.data.UsuarioRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class LibroViewModel : ViewModel() {
     private val libroRepo = LibroRepository()
+    private val usuarioRepo = UsuarioRepository()
 
     private val _mensError = MutableLiveData<String?>()
     val mensError: LiveData<String?> = _mensError
@@ -25,11 +27,20 @@ class LibroViewModel : ViewModel() {
     private val _liked = MutableLiveData(false)
     val liked: LiveData<Boolean> = _liked
 
-    fun likeChange() {
-        if (_liked.value == true) {
-            _liked.value = false
-        } else {
-            _liked.value = true
+    fun likeChange(libro: Libro, onComplete: (String) -> Unit) {
+        val currentUser = Autentificacion.usuarioActualUid
+        if (currentUser != null) {
+            if (_liked.value == false) {
+                _liked.value = true
+                usuarioRepo.libroLike(currentUser,libro) {
+                    onComplete("Libro agregado a favoritos")
+                }
+            } else {
+                _liked.value = false
+                usuarioRepo.borrarLibroLike(currentUser,libro) {
+                    onComplete("Libro borrado de favoritos")
+                }
+            }
         }
     }
 

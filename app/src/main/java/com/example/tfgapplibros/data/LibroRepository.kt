@@ -127,7 +127,6 @@ class LibroRepository {
         val librosCollection = db.collectionGroup("libros")
 
         var query = librosCollection.whereNotEqualTo("userId", excludeId).limit(limit)
-//        var query =  librosCollection.limit(limit)
 
         lastDocumentSnapshot?.let {
             query = query.startAfter(it)
