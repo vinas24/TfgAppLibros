@@ -44,6 +44,20 @@ class LibroViewModel : ViewModel() {
         }
     }
 
+    fun checkLiked(libroId: String) {
+        val currentUser = Autentificacion.usuarioActualUid
+        if (currentUser != null) {
+            usuarioRepo.esFavorito(currentUser,libroId) { esFav ->
+                if(esFav) {
+                    _liked.value = true
+                } else {
+                    _liked.value = false
+                }
+            }
+
+        }
+    }
+
     fun obtenerLibro(libroId: String?, userId: String?, onComplete: (Libro?) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             if (libroId != null && userId != null) {

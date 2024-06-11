@@ -112,6 +112,27 @@ class UsuarioRepository {
             }
     }
 
+    fun esFavorito(userId: String, libroId: String, result: (Boolean) -> Unit) {
+
+        val favRef = db
+            .collection("usuarios")
+            .document(userId)
+            .collection("favoritos")
+            .document(libroId)
+
+        favRef.get()
+            .addOnSuccessListener {
+                if (it.exists()) {
+                    result(true)
+                }else {
+                    result(false)
+                }
+            }.addOnFailureListener{ e ->
+                e.printStackTrace()
+                result(false)
+            }
+    }
+
 
     //TODO: Esto se realizará en un futuro hopefully
 //    fun actualizarUsuario(

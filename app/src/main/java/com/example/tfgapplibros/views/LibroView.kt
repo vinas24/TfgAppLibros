@@ -69,6 +69,7 @@ fun LibroView(
     var libro by remember { mutableStateOf<Libro?>(null) }
 
     SideEffect {
+        viewModel.checkLiked(libroId)
         viewModel.obtenerLibro(libroId, userId) { lib ->
             libro = lib
         }
