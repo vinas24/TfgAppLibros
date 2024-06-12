@@ -18,17 +18,24 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -41,6 +48,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -376,21 +384,28 @@ fun RegistrarUsuarioView(
  */
 
 @Composable
-fun RegistrationScreen(navController: NavHostController) {
+fun RegistrationScreen(navController: NavHostController, viewModel: RegisterViewModel = viewModel()) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "registration_screen_1") {
         composable("registration_screen_1") {
-            RegistrationScreenPart1(navController = navController)
+            RegistrationScreenPart1(navController = navController, viewModel = viewModel)
         }
         composable("registration_screen_2") {
-            RegistrationScreenPart2(navController = navController)
+            RegistrationScreenPart2(navController = navController, viewModel = viewModel)
+        }
+        composable("principal_screen"){
+            PrincipalScreen(navController = navController)
         }
     }
+}
+@Composable
+fun PrincipalScreen(navController: NavHostController){
+    navController.navigate(PrincipalScreen)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegistrationScreenPart1(navController: NavHostController, viewModel: RegisterViewModel = viewModel()) {
+fun RegistrationScreenPart1(navController: NavHostController, viewModel: RegisterViewModel) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -416,8 +431,24 @@ fun RegistrationScreenPart1(navController: NavHostController, viewModel: Registe
 
         Scaffold(
             topBar = {
-                TopAppBar(title = { Text(text = "Registro de nuevo lector") })
-            }
+                CenterAlignedTopAppBar(
+                    title = {Text(text = "Nuevo lector", color = Color.White)  },
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            navController.popBackStack()
+                        }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                tint = getColorFromResource(colorResId = R.color.background_light),
+                                contentDescription = ""
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = colorResource(id = R.color.primary_dark),
+                        titleContentColor = Color.White))
+            },
+                    containerColor = getColorFromResource(colorResId = R.color.background_light)
         ) { paddingValues ->
             Column(
                 modifier = Modifier
@@ -435,7 +466,7 @@ fun RegistrationScreenPart1(navController: NavHostController, viewModel: Registe
                             .fillMaxWidth()
                             .padding(horizontal = 30.dp)
                             .aspectRatio(4f / 5f)
-                            .clip(RoundedCornerShape(16.dp))
+                            .clip(CircleShape)
                             .clickable(onClick = {
                                 photoPickerLauncher.launch(
                                     PickVisualMediaRequest(
@@ -443,7 +474,7 @@ fun RegistrationScreenPart1(navController: NavHostController, viewModel: Registe
                                     )
                                 )
                             }),
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Crop,
                     )
                 } else {
                     Image(
@@ -453,7 +484,7 @@ fun RegistrationScreenPart1(navController: NavHostController, viewModel: Registe
                             .fillMaxWidth()
                             .padding(horizontal = 30.dp)
                             .aspectRatio(4f / 5f)
-                            .clip(RoundedCornerShape(16.dp))
+                            .clip(CircleShape)
                             .clickable(onClick = {
                                 photoPickerLauncher.launch(
                                     PickVisualMediaRequest(
@@ -512,7 +543,7 @@ fun RegistrationScreenPart1(navController: NavHostController, viewModel: Registe
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegistrationScreenPart2(navController: NavHostController, viewModel: RegisterViewModel = viewModel()) {
+fun RegistrationScreenPart2(navController: NavHostController, viewModel: RegisterViewModel) {
 
     var listaGeneros = listOf("Ficción", "Fantasía", "Misterio", "Romance", "Histórica", "Poesía", "Infantil", "Juveníl",
         "Autoayuda", "Terror")
@@ -572,10 +603,16 @@ fun RegistrationScreenPart2(navController: NavHostController, viewModel: Registe
                 ),
                 modifier = commonModifier
             )
-            CampoTextoLargo(
+            Spacer(modifier = Modifier.height(16.dp))
+            CampoTexto(
                 text = biografia,
                 onTextChanged = { viewModel.biografiaChange(it) },
-                label = "Biografia"
+                label = "Biografia",
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Done
+                ),
+                modifier = commonModifier
             )
             Spacer(modifier = Modifier.height(16.dp))
             CampoTexto(
@@ -662,6 +699,7 @@ fun RegistrationScreenPart2(navController: NavHostController, viewModel: Registe
                     }
                 }
             }
+            Spacer(modifier = Modifier.height(16.dp))
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -677,7 +715,7 @@ fun RegistrationScreenPart2(navController: NavHostController, viewModel: Registe
                     viewModel.registerUser {
                         Toast.makeText(context, "Registro exitoso", Toast.LENGTH_LONG).show()
                         navController.navigate(
-                            PrincipalScreen
+                            "principal_screen"
                         )
                     }
                 }
