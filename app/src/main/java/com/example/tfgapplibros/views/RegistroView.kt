@@ -4,10 +4,14 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -25,6 +30,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -33,6 +39,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -68,7 +75,6 @@ import com.example.tfgapplibros.components.CampoTextoLargo
 import com.example.tfgapplibros.components.getColorFromResource
 import com.example.tfgapplibros.model.RegisterViewModel
 
-/*
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -97,59 +103,70 @@ fun RegisterUser (
         },
         containerColor = getColorFromResource(colorResId = R.color.background_light)
     ) {
-        RegistrarUsuarioView(
+        RegistrationScreen(
             viewModel = viewModel,
             navController = navController)
     }
 }
 
- */
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterUser (
-    navController : NavHostController,
-    viewModel : RegisterViewModel = viewModel()
+fun RegistrationScreen(
+    navController: NavHostController,
+    viewModel: RegisterViewModel
 ) {
-    RegistrationScreen(navController = navController)
+    // State to keep track of the current screen
+    var currentScreen by remember { mutableStateOf(1) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        AnimatedVisibility(
+            visible = currentScreen == 1,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            RegistroUsuarioScreen1(viewModel = viewModel, onNextClick = { currentScreen = 2 })
+        }
+
+        AnimatedVisibility(
+            visible = currentScreen == 2,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            RegistroUsuarioScreen2(viewModel = viewModel, navController = navController, onBackClick = { currentScreen = 1 })
+        }
+    }
 }
 
 
-/*
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegistrarUsuarioView(
+fun RegistroUsuarioScreen1(
     viewModel : RegisterViewModel,
-    navController : NavHostController
+    onNextClick:() -> Unit
 ) {
-    var listaGeneros = listOf("Ficción", "Fantasía", "Misterio", "Romance", "Histórica", "Poesía", "Infantil", "Juveníl", "Autoayuda", "Terror" )
-
-    val context = LocalContext.current
-
+    val fotoPerfil by viewModel.fotoPerfil.observeAsState()
     val nombreUsuario by viewModel.nombreUsuario.observeAsState("")
     val contrasena by viewModel.contrasena.observeAsState("")
     val correo by viewModel.correo.observeAsState("")
-    val nombre by viewModel.nombre.observeAsState("")
-    val apellidos by viewModel.apellidos.observeAsState("")
-    val biografia by viewModel.biografia.observeAsState("")
-    val ciudad by viewModel.ciudad.observeAsState("")
-    val pais by viewModel.pais.observeAsState("")
-    val numeroTelefono by viewModel.numeroTelefono.observeAsState("")
-    val fotoPerfil by viewModel.fotoPerfil.observeAsState()
 
-    //Dropdown
-    val generos by viewModel.generos.observeAsState(emptyList())
-    var expanded by remember { mutableStateOf(false) }
+    //Confirmación de contraseña
+    var confirmPassword by remember { mutableStateOf("") }
+    var passwordMatchError by remember { mutableStateOf(false) }
+    var passwordLengthError by remember { mutableStateOf(false) }
 
     //Imagen
-    val placeholderId = R.drawable.libro
+    val placeholderId = R.drawable.usuario
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri -> uri?.let { viewModel.fotoPerfilChange(uri) } }
     )
-    val camposRellenos =
-        nombreUsuario.isNotEmpty() && contrasena.isNotEmpty() && correo.isNotBlank() && nombre.isNotEmpty() &&
-        apellidos.isNotEmpty() && biografia.isNotEmpty() && pais.isNotEmpty() && ciudad.isNotEmpty() && numeroTelefono != 0
+    val camposRellenosCorrectamente =
+        nombreUsuario.isNotEmpty() && contrasena.isNotEmpty() && correo.isNotBlank()
+        && contrasena.length >= 6 && contrasena.equals(confirmPassword)
 
     val commonModifier =
         Modifier
@@ -179,29 +196,48 @@ fun RegistrarUsuarioView(
                 .verticalScroll(rememberScrollState())
 
         ) {
+            Spacer(modifier = Modifier.height(16.dp))
+            if (fotoPerfil != null) {
+                AsyncImage(
+                    model = fotoPerfil,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(250.dp)
+                        .padding(horizontal = 30.dp)
+                        .aspectRatio(4f / 5f)
+                        .clip(CircleShape)
+                        .clickable(onClick = {
+                            photoPickerLauncher.launch(
+                                PickVisualMediaRequest(
+                                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                                )
+                            )
+                        })
+                        .align(Alignment.CenterHorizontally),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = placeholderId),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(250.dp)
+                        .padding(horizontal = 30.dp)
+                        .aspectRatio(4f / 5f)
+                        .clip(CircleShape)
+                        .clickable(onClick = {
+                            photoPickerLauncher.launch(
+                                PickVisualMediaRequest(
+                                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                                )
+                            )
+                        }
+                        )
+                        .align(Alignment.CenterHorizontally),
+                    contentScale = ContentScale.Crop
+                )
+            }
             Spacer(modifier = Modifier.height(32.dp))
-            CampoTexto(
-                text = nombre,
-                onTextChanged = { viewModel.nombreChange(it) },
-                label = "Nombre",
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Next
-                ),
-                modifier = commonModifier
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            CampoTexto(
-                text = apellidos,
-                onTextChanged = { viewModel.apellidosChange(it) },
-                label = "Apellidos",
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done
-                ),
-                modifier = commonModifier
-            )
-            Spacer(modifier = Modifier.height(16.dp))
             CampoTexto(
                 text = nombreUsuario,
                 onTextChanged = { viewModel.nombreUsuarioChange(it) },
@@ -226,7 +262,9 @@ fun RegistrarUsuarioView(
             Spacer(modifier = Modifier.height(16.dp))
             CampoContrasenaRegister(
                 password = contrasena,
-                onPasswordChanged = { viewModel.contrasenaChange(it) },
+                onPasswordChanged = { viewModel.contrasenaChange(it)
+                                    passwordMatchError = it != confirmPassword
+                                    passwordLengthError = it.length < 6},
                 label = "Contraseña",
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
@@ -234,128 +272,30 @@ fun RegistrarUsuarioView(
                 ),
                 modifier = commonModifier
             )
-            Spacer(modifier = Modifier.height(16.dp))
-            CampoTexto(
-                text = ciudad,
-                onTextChanged = { viewModel.ciudadChange(it) },
-                label = "Ciudad",
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done
-                ),
-                modifier = commonModifier
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            CampoTexto(
-                text = pais,
-                onTextChanged = { viewModel.paisChange(it) },
-                label = "País",
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done
-                ),
-                modifier = commonModifier
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            CampoTexto(
-                text = numeroTelefono.toString(),
-                onTextChanged = { viewModel.numeroTelefonoChange(it.trim().toInt()) },
-                label = "Número teléfono",
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done
-                ),
-                modifier = commonModifier
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = it },
-                modifier = Modifier.padding(horizontal = 60.dp)
-            ) {
-                val colorPrim = getColorFromResource(colorResId = R.color.primary)
-                val colorPrim2 = getColorFromResource(colorResId = R.color.primary_dark)
-                val colorBack = getColorFromResource(colorResId = R.color.background_light)
-
-                OutlinedTextField(
-                    modifier = Modifier.menuAnchor(),
-                    readOnly = true,
-                    value = generos.joinToString(", "),
-                    onValueChange = { },
-                    label = { Text("Géneros favoritos") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    colors = ExposedDropdownMenuDefaults.textFieldColors(
-                        focusedLabelColor = colorPrim2,
-                        focusedIndicatorColor = colorPrim2,
-                        focusedContainerColor = colorBack,
-                        cursorColor = colorPrim2,
-                        unfocusedIndicatorColor = colorPrim,
-                        unfocusedLabelColor = colorPrim,
-                        unfocusedContainerColor = colorBack,
-                        focusedTextColor = colorPrim2,
-                        unfocusedTextColor = colorPrim,
-                        focusedLeadingIconColor = colorPrim2,
-                    ),
+            if (passwordLengthError) {
+                Text(
+                    text = "La contraseña debe tener al menos 6 caracteres",
+                    color = Color.Red,
+                    modifier = Modifier.padding(horizontal = 30.dp)
                 )
-
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                    Modifier.background(getColorFromResource(colorResId = R.color.background_dark))
-                ) {
-                    listaGeneros.forEach { selec ->
-                        DropdownMenuItem(
-                            text = { Text(text = selec, color = Color.Black) },
-                            onClick = {
-                                if (selec !in generos) {
-                                    val generosFavoritos = generos + selec
-                                    viewModel.generosChange(
-                                        generosFavoritos
-                                    )
-                                }
-                            },
-                            contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                        )
-                    }
-                }
             }
-            Spacer(modifier = Modifier.height(32.dp))
-            if (fotoPerfil != null) {
-                AsyncImage(
-                    model = fotoPerfil,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 30.dp)
-                        .aspectRatio(4f / 5f)
-                        .clip(RoundedCornerShape(16.dp))
-                        .clickable(onClick = {
-                            photoPickerLauncher.launch(
-                                PickVisualMediaRequest(
-                                    ActivityResultContracts.PickVisualMedia.ImageOnly
-                                )
-                            )
-                        }),
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                Image(
-                    painter = painterResource(id = placeholderId),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 30.dp)
-                        .aspectRatio(4f / 5f)
-                        .clip(RoundedCornerShape(16.dp))
-                        .clickable(onClick = {
-                            photoPickerLauncher.launch(
-                                PickVisualMediaRequest(
-                                    ActivityResultContracts.PickVisualMedia.ImageOnly
-                                )
-                            )
-                        }
-                        ),
-                    contentScale = ContentScale.Crop
+            Spacer(modifier = Modifier.height(16.dp))
+            CampoContrasenaRegister(
+                password = confirmPassword,
+                onPasswordChanged = { confirmPassword = it
+                                    passwordMatchError = it != contrasena },
+                label = "Repetir contraseña",
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done
+                ),
+                modifier = commonModifier
+            )
+            if (passwordMatchError) {
+                Text(
+                    text = "Las contraseñas no coinciden",
+                    color = Color.Red,
+                    modifier = Modifier.padding(horizontal = 30.dp)
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -366,176 +306,10 @@ fun RegistrarUsuarioView(
                 horizontalArrangement = Arrangement.Center
             ) {
                 BotonRegister(
-                    texto = "Crear Usuario",
-                    enabled = camposRellenos
-                )
-                {
-                    viewModel.registerUser() {
-                        Toast.makeText(context, "Registro exitoso", Toast.LENGTH_LONG).show()
-                        navController.navigate(
-                            PrincipalScreen
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
- */
-
-@Composable
-fun RegistrationScreen(navController: NavHostController, viewModel: RegisterViewModel = viewModel()) {
-    val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "registration_screen_1") {
-        composable("registration_screen_1") {
-            RegistrationScreenPart1(navController = navController, viewModel = viewModel)
-        }
-        composable("registration_screen_2") {
-            RegistrationScreenPart2(navController = navController, viewModel = viewModel)
-        }
-        composable("principal_screen"){
-            PrincipalScreen(navController = navController)
-        }
-    }
-}
-@Composable
-fun PrincipalScreen(navController: NavHostController){
-    navController.navigate(PrincipalScreen)
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun RegistrationScreenPart1(navController: NavHostController, viewModel: RegisterViewModel) {
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        val nombreUsuario by viewModel.nombreUsuario.observeAsState("")
-        val contrasena by viewModel.contrasena.observeAsState("")
-        val correo by viewModel.correo.observeAsState("")
-        val fotoPerfil by viewModel.fotoPerfil.observeAsState()
-
-        //Imagen
-        val placeholderId = R.drawable.libro
-        val photoPickerLauncher = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.PickVisualMedia(),
-            onResult = { uri -> uri?.let { viewModel.fotoPerfilChange(uri) } }
-        )
-        val camposRellenos =
-            nombreUsuario.isNotEmpty() && contrasena.isNotEmpty() && correo.isNotBlank()
-
-        val commonModifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 30.dp)
-
-        Scaffold(
-            topBar = {
-                CenterAlignedTopAppBar(
-                    title = {Text(text = "Nuevo lector", color = Color.White)  },
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            navController.popBackStack()
-                        }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                tint = getColorFromResource(colorResId = R.color.background_light),
-                                contentDescription = ""
-                            )
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = colorResource(id = R.color.primary_dark),
-                        titleContentColor = Color.White))
-            },
-                    containerColor = getColorFromResource(colorResId = R.color.background_light)
-        ) { paddingValues ->
-            Column(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .fillMaxSize()
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                Spacer(modifier = Modifier.height(32.dp))
-                if (fotoPerfil != null) {
-                    AsyncImage(
-                        model = fotoPerfil,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 30.dp)
-                            .aspectRatio(4f / 5f)
-                            .clip(CircleShape)
-                            .clickable(onClick = {
-                                photoPickerLauncher.launch(
-                                    PickVisualMediaRequest(
-                                        ActivityResultContracts.PickVisualMedia.ImageOnly
-                                    )
-                                )
-                            }),
-                        contentScale = ContentScale.Crop,
-                    )
-                } else {
-                    Image(
-                        painter = painterResource(id = placeholderId),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 30.dp)
-                            .aspectRatio(4f / 5f)
-                            .clip(CircleShape)
-                            .clickable(onClick = {
-                                photoPickerLauncher.launch(
-                                    PickVisualMediaRequest(
-                                        ActivityResultContracts.PickVisualMedia.ImageOnly
-                                    )
-                                )
-                            }
-                            ),
-                        contentScale = ContentScale.Crop
-                    )
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                CampoTexto(
-                    text = nombreUsuario,
-                    onTextChanged = { viewModel.nombreUsuarioChange(it) },
-                    label = "Nombre de Usuario",
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Done
-                    ),
-                    modifier = commonModifier
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                CampoTexto(
-                    text = correo,
-                    onTextChanged = { viewModel.correoChange(it) },
-                    label = "Correo",
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Email,
-                        imeAction = ImeAction.Done
-                    ),
-                    modifier = commonModifier
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                CampoContrasenaRegister(
-                    password = contrasena,
-                    onPasswordChanged = { viewModel.contrasenaChange(it) },
-                    label = "Contraseña",
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Password,
-                        imeAction = ImeAction.Done
-                    ),
-                    modifier = commonModifier
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                BotonRegister(
                     texto = "Siguiente",
-                    enabled = camposRellenos
-                ) {
-                    navController.navigate("registration_screen_2")
-                }
+                    enabled = camposRellenosCorrectamente,
+                    onClick = onNextClick
+                )
             }
         }
     }
@@ -543,12 +317,15 @@ fun RegistrationScreenPart1(navController: NavHostController, viewModel: Registe
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegistrationScreenPart2(navController: NavHostController, viewModel: RegisterViewModel) {
-
-    var listaGeneros = listOf("Ficción", "Fantasía", "Misterio", "Romance", "Histórica", "Poesía", "Infantil", "Juveníl",
-        "Autoayuda", "Terror")
-
+fun RegistroUsuarioScreen2(
+    viewModel: RegisterViewModel,
+    navController: NavHostController,
+    onBackClick:() -> Unit
+) {
     val context = LocalContext.current
+
+    var listaGeneros = listOf("Ficción", "Fantasía", "Misterio", "Romance", "Histórica", "Poesía",
+        "Infantil", "Juveníl", "Autoayuda", "Terror")
 
     val nombre by viewModel.nombre.observeAsState("")
     val apellidos by viewModel.apellidos.observeAsState("")
@@ -562,26 +339,38 @@ fun RegistrationScreenPart2(navController: NavHostController, viewModel: Registe
     var expanded by remember { mutableStateOf(false) }
 
     val camposRellenos =
-        nombre.isNotEmpty() && apellidos.isNotEmpty() && biografia.isNotEmpty() && biografia.isNotEmpty()
-                && pais.isNotEmpty() && ciudad.isNotEmpty() && numeroTelefono != 0
+        nombre.isNotEmpty() && apellidos.isNotEmpty() && biografia.isNotBlank()
+        && ciudad.isNotEmpty() && pais.isNotEmpty() && numeroTelefono != 0
 
     val commonModifier =
         Modifier
             .fillMaxWidth()
             .padding(horizontal = 30.dp)
 
-    Scaffold(
-        topBar = {
-            TopAppBar(title = { Text(text = "Datos personales") })
+    if (viewModel.loading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = .05f))
+                .verticalScroll(rememberScrollState()),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(color = getColorFromResource(colorResId = R.color.primary))
         }
-    ) { paddingValues ->
+    }
+
+    Surface(
+        color = getColorFromResource(colorResId = R.color.background_light),
+        modifier = Modifier.padding(top = 95.dp)
+    ) {
         Column(
             modifier = Modifier
-                .padding(paddingValues)
+                .padding(horizontal = 12.dp)
                 .fillMaxSize()
-                .padding(16.dp)
                 .verticalScroll(rememberScrollState())
+
         ) {
+            Spacer(modifier = Modifier.height(16.dp))
             CampoTexto(
                 text = nombre,
                 onTextChanged = { viewModel.nombreChange(it) },
@@ -607,7 +396,7 @@ fun RegistrationScreenPart2(navController: NavHostController, viewModel: Registe
             CampoTexto(
                 text = biografia,
                 onTextChanged = { viewModel.biografiaChange(it) },
-                label = "Biografia",
+                label = "Biografía",
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done
@@ -699,23 +488,28 @@ fun RegistrationScreenPart2(navController: NavHostController, viewModel: Registe
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(32.dp))
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 16.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
+                BotonRegister(
+                    texto = "Atrás",
+                    enabled = true,
+                    onClick = onBackClick
+                )
                 Spacer(modifier = Modifier.width(16.dp))
                 BotonRegister(
                     texto = "Crear Usuario",
                     enabled = camposRellenos
                 )
                 {
-                    viewModel.registerUser {
-                        Toast.makeText(context, "Registro exitoso", Toast.LENGTH_LONG).show()
+                    viewModel.registerUser() {
+                        Toast.makeText(context, "Registro exotico", Toast.LENGTH_LONG).show()
                         navController.navigate(
-                            "principal_screen"
+                            PrincipalScreen
                         )
                     }
                 }

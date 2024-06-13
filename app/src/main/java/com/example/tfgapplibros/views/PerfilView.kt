@@ -380,9 +380,6 @@ fun Favoritos(favoritos:List<Libro>,navController: NavHostController) {
     }
 }
 
-
-
-
 //TODO: Mover la imagen a Images.kt
 @Composable
 fun ImagenRedonda(
