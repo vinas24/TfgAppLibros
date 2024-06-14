@@ -338,9 +338,13 @@ fun RegistroUsuarioScreen2(
     val generos by viewModel.generos.observeAsState(emptyList())
     var expanded by remember { mutableStateOf(false) }
 
+    var biografiaLengthError by remember { mutableStateOf(false) }
+    var telefonoLengthError by remember { mutableStateOf(false) }
+
     val camposRellenos =
         nombre.isNotEmpty() && apellidos.isNotEmpty() && biografia.isNotBlank()
         && ciudad.isNotEmpty() && pais.isNotEmpty() && numeroTelefono != 0
+        && biografia.length <= 100 && numeroTelefono.toString().length == 9
 
     val commonModifier =
         Modifier
@@ -395,7 +399,8 @@ fun RegistroUsuarioScreen2(
             Spacer(modifier = Modifier.height(16.dp))
             CampoTexto(
                 text = biografia,
-                onTextChanged = { viewModel.biografiaChange(it) },
+                onTextChanged = { viewModel.biografiaChange(it)
+                                biografiaLengthError = it.length > 100},
                 label = "Biografía",
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
@@ -403,6 +408,13 @@ fun RegistroUsuarioScreen2(
                 ),
                 modifier = commonModifier
             )
+            if (biografiaLengthError) {
+                Text(
+                    text = "La biografía no puede tener más de 100 caracteres",
+                    color = Color.Red,
+                    modifier = Modifier.padding(horizontal = 30.dp)
+                )
+            }
             Spacer(modifier = Modifier.height(16.dp))
             CampoTexto(
                 text = ciudad,
@@ -428,7 +440,8 @@ fun RegistroUsuarioScreen2(
             Spacer(modifier = Modifier.height(16.dp))
             CampoTexto(
                 text = numeroTelefono.toString(),
-                onTextChanged = { viewModel.numeroTelefonoChange(it.trim().toInt()) },
+                onTextChanged = { viewModel.numeroTelefonoChange(it.trim().toInt())
+                                telefonoLengthError = it.length != 9},
                 label = "Número teléfono",
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
@@ -436,6 +449,13 @@ fun RegistroUsuarioScreen2(
                 ),
                 modifier = commonModifier
             )
+            if (telefonoLengthError) {
+                Text(
+                    text = "El número de teléfono debe de tener 9 caracteres",
+                    color = Color.Red,
+                    modifier = Modifier.padding(horizontal = 30.dp)
+                )
+            }
             Spacer(modifier = Modifier.height(16.dp))
             ExposedDropdownMenuBox(
                 expanded = expanded,
