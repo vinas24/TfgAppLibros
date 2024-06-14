@@ -171,7 +171,7 @@ fun RegistroUsuarioScreen1(
     val commonModifier =
         Modifier
             .fillMaxWidth()
-            .padding(horizontal = 30.dp)
+            .padding(horizontal = 5.dp)
 
     if (viewModel.loading) {
         Box(
@@ -191,20 +191,18 @@ fun RegistroUsuarioScreen1(
     ) {
         Column(
             modifier = Modifier
-                .padding(horizontal = 12.dp)
+                .padding(horizontal = 6.dp)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
 
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             if (fotoPerfil != null) {
                 AsyncImage(
                     model = fotoPerfil,
                     contentDescription = null,
                     modifier = Modifier
-                        .size(250.dp)
-                        .padding(horizontal = 30.dp)
-                        .aspectRatio(4f / 5f)
+                        .size(175.dp)
                         .clip(CircleShape)
                         .clickable(onClick = {
                             photoPickerLauncher.launch(
@@ -221,9 +219,7 @@ fun RegistroUsuarioScreen1(
                     painter = painterResource(id = placeholderId),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(250.dp)
-                        .padding(horizontal = 30.dp)
-                        .aspectRatio(4f / 5f)
+                        .size(175.dp)
                         .clip(CircleShape)
                         .clickable(onClick = {
                             photoPickerLauncher.launch(
@@ -237,14 +233,14 @@ fun RegistroUsuarioScreen1(
                     contentScale = ContentScale.Crop
                 )
             }
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
             CampoTexto(
                 text = nombreUsuario,
                 onTextChanged = { viewModel.nombreUsuarioChange(it) },
                 label = "Nombre de Usuario",
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done
+                    imeAction = ImeAction.Next
                 ),
                 modifier = commonModifier
             )
@@ -255,7 +251,7 @@ fun RegistroUsuarioScreen1(
                 label = "Correo",
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email,
-                    imeAction = ImeAction.Done
+                    imeAction = ImeAction.Next
                 ),
                 modifier = commonModifier
             )
@@ -268,7 +264,7 @@ fun RegistroUsuarioScreen1(
                 label = "Contraseña",
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Done
+                    imeAction = ImeAction.Next
                 ),
                 modifier = commonModifier
             )
@@ -287,7 +283,7 @@ fun RegistroUsuarioScreen1(
                 label = "Repetir contraseña",
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Done
+                    imeAction = ImeAction.Done,
                 ),
                 modifier = commonModifier
             )
@@ -349,7 +345,7 @@ fun RegistroUsuarioScreen2(
     val commonModifier =
         Modifier
             .fillMaxWidth()
-            .padding(horizontal = 30.dp)
+            .padding(horizontal = 5.dp)
 
     if (viewModel.loading) {
         Box(
@@ -398,25 +394,6 @@ fun RegistroUsuarioScreen2(
             )
             Spacer(modifier = Modifier.height(16.dp))
             CampoTexto(
-                text = biografia,
-                onTextChanged = { viewModel.biografiaChange(it)
-                                biografiaLengthError = it.length > 100},
-                label = "Biografía",
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done
-                ),
-                modifier = commonModifier
-            )
-            if (biografiaLengthError) {
-                Text(
-                    text = "La biografía no puede tener más de 100 caracteres",
-                    color = Color.Red,
-                    modifier = Modifier.padding(horizontal = 30.dp)
-                )
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            CampoTexto(
                 text = ciudad,
                 onTextChanged = { viewModel.ciudadChange(it) },
                 label = "Ciudad",
@@ -460,7 +437,7 @@ fun RegistroUsuarioScreen2(
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = { expanded = it },
-                modifier = Modifier.padding(horizontal = 60.dp)
+                modifier = Modifier.padding(horizontal = 25.dp)
             ) {
                 val colorPrim = getColorFromResource(colorResId = R.color.primary)
                 val colorPrim2 = getColorFromResource(colorResId = R.color.primary_dark)
@@ -501,12 +478,32 @@ fun RegistroUsuarioScreen2(
                                     viewModel.generosChange(
                                         generosFavoritos
                                     )
+                                } else {
+                                    val generosFavoritos = generos - selec
+                                    viewModel.generosChange(
+                                        generosFavoritos
+                                    )
                                 }
                             },
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                         )
                     }
                 }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            CampoTextoLargo(
+                text = biografia,
+                onTextChanged = { viewModel.biografiaChange(it)
+                    biografiaLengthError = it.length > 100},
+                label = "Biografía",
+                modifier = commonModifier
+            )
+            if (biografiaLengthError) {
+                Text(
+                    text = "La biografía no puede tener más de 100 caracteres",
+                    color = Color.Red,
+                    modifier = Modifier.padding(horizontal = 30.dp)
+                )
             }
             Spacer(modifier = Modifier.height(32.dp))
             Row(

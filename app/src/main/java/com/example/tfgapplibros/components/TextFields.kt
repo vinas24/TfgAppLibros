@@ -39,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.DefaultShadowColor
@@ -252,6 +253,7 @@ fun CampoContrasenaLogin(
             modifier = modifier
                 .fillMaxWidth()
                 .padding(horizontal = 30.dp)
+                .onFocusChanged { !it.isFocused }
         )
 
     }
@@ -307,6 +309,8 @@ fun CampoContrasenaRegister(
             modifier = modifier
                 .fillMaxWidth()
                 .padding(horizontal = 30.dp)
+                .onFocusChanged { !it.isFocused },
+
         )
 
     }
@@ -343,6 +347,7 @@ fun CampoSlider(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 40.dp)
+                .onFocusChanged { !it.isFocused }
         )
     }
 }
@@ -424,7 +429,8 @@ fun MySearchBar(
         modifier = modifier
             .fillMaxWidth()
             .background(Color.White, shape = CircleShape)
-            .padding(4.dp),
+            .padding(4.dp)
+            .onFocusChanged { !it.isFocused },
         placeholder = { Text(text = placeholder) },
         leadingIcon = {
             IconButton(onClick = { Result(searchTextState.value.text)}) {
