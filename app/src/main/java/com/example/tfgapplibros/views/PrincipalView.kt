@@ -78,7 +78,6 @@ fun Principal(
 
 
     LaunchedEffect(Unit) {
-        Log.d("Librooooos",currentUserId?:"")
         viewModel.recogerLibros(currentUserId ?: "")
     }
 
@@ -161,7 +160,7 @@ fun TopBarPrincipal(
             ),
             selected = filtro == 0,
             onClick = { viewModel.changeFiltro(0) },
-            label = { Text(text = "Por Título" ) })
+            label = { Text(text = "Título" ) })
         Spacer(modifier = Modifier.size(8.dp))
         FilterChip(
             colors = FilterChipDefaults.filterChipColors(
@@ -170,7 +169,7 @@ fun TopBarPrincipal(
             ),
             selected = filtro == 1,
             onClick = { viewModel.changeFiltro(1) },
-            label = { Text(text = "Por Autor" ) })
+            label = { Text(text = "Autor" ) })
 
         Spacer(modifier = Modifier.size(8.dp))
 
@@ -181,7 +180,7 @@ fun TopBarPrincipal(
             ),
             selected = filtro == 2,
             onClick = { viewModel.changeFiltro(2)},
-            label = { Text(text = "Por Género" ) })
+            label = { Text(text = "Género" ) })
 
 
     }
@@ -220,18 +219,47 @@ fun PaginaPrincipal(
     ) {
         items(libros) { libroPag ->
             val libro = libroPag.libro
-            if(libro.autor.lowercase().contains(search.lowercase()) || libro.titulo.lowercase().contains(search.lowercase())) {
-                CartaLibroPerfil(libro = libro) {
-                    navController.navigate(
-                        LibroScreen(
-                            userId = libro.userId,
-                            libroId = libro.libroId
-                        )
-                    )
+            when (viewModel.filtro.value) {
+                0 -> {
+                    if(libro.titulo.lowercase().contains(search.lowercase())) {
+                        CartaLibroPerfil(libro = libro) {
+                            navController.navigate(
+                                LibroScreen(
+                                    userId = libro.userId,
+                                    libroId = libro.libroId
+                                )
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(4.dp))
+                    }
                 }
-                Spacer(modifier = Modifier.height(4.dp))
+                1 ->  {
+                    if(libro.autor.lowercase().contains(search.lowercase())) {
+                        CartaLibroPerfil(libro = libro) {
+                            navController.navigate(
+                                LibroScreen(
+                                    userId = libro.userId,
+                                    libroId = libro.libroId
+                                )
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(4.dp))
+                    }
+                }
+                2 -> {
+                    if(libro.genero.lowercase().contains(search.lowercase())) {
+                        CartaLibroPerfil(libro = libro) {
+                            navController.navigate(
+                                LibroScreen(
+                                    userId = libro.userId,
+                                    libroId = libro.libroId
+                                )
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(4.dp))
+                    }
+                }
             }
-
         }
         item {
 

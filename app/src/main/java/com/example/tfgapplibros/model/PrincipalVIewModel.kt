@@ -21,7 +21,7 @@ class PrincipalVIewModel: ViewModel() {
     var loading = false
     var endOfListReached = false
 
-    private val _search = MutableLiveData<String>("")
+    private val _search = MutableLiveData("")
     val search: LiveData<String> = _search
 
     fun changesearch(string: String) {
@@ -32,7 +32,6 @@ class PrincipalVIewModel: ViewModel() {
         if (loading || endOfListReached) return
 
         loading = true
-        Log.d("Librooooos","empieza el loading")
             libroRepo.librosPrincipal(excludeId,lastDocumentSnapshot,limit).observeForever { newLibros ->
                 if (newLibros.isNotEmpty()) {
                     lastDocumentSnapshot = newLibros.last().documentSnapshot
@@ -47,7 +46,6 @@ class PrincipalVIewModel: ViewModel() {
                 _libros.postValue(_libros.value)
                 Handler(Looper.getMainLooper()).post{
                     loading = false
-                    Log.d("Librooooos","acaba el loading")
                 }
 
             }
