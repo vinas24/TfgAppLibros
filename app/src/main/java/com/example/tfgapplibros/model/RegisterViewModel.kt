@@ -47,8 +47,8 @@ class RegisterViewModel : ViewModel() {
     private val _ciudad = MutableLiveData<String>()
     val ciudad: LiveData<String> = _ciudad
 
-    private val _numeroTelefono = MutableLiveData<Int>()
-    val numeroTelefono: LiveData<Int> = _numeroTelefono
+    private val _numeroTelefono = MutableLiveData<Long>()
+    val numeroTelefono: LiveData<Long> = _numeroTelefono
 
     private val _generos = MutableLiveData<List<String>>()
     val generos: LiveData<List<String>> = _generos
@@ -98,7 +98,7 @@ class RegisterViewModel : ViewModel() {
         _pais.value = newPais
     }
 
-    fun numeroTelefonoChange(newNumeroTelefono : Int){
+    fun numeroTelefonoChange(newNumeroTelefono : Long){
         _numeroTelefono.value = newNumeroTelefono
     }
 
@@ -127,7 +127,7 @@ class RegisterViewModel : ViewModel() {
         val fotoPerfil = _fotoPerfil.value
 
         if (nombreUsuario.isBlank() || contrasena.isBlank() || correo.isBlank() || nombre.isBlank() || apellidos.isBlank()
-            ||biografia.isBlank() || pais.isBlank() || ciudad.isBlank() || numeroTelefono == 0 || generos.isEmpty()
+            ||biografia.isBlank() || pais.isBlank() || ciudad.isBlank() || numeroTelefono == 0L || generos.isEmpty()
             || fotoPerfil == null) {
             _mensError.value = "Rellena todos los campos"
             return

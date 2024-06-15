@@ -11,7 +11,7 @@ data class Usuario(
     val biografia : String = "",
     val pais : String = "",
     val ciudad : String = "",
-    val numeroTelefono : Int = 1,
+    val numeroTelefono : Long = 1L,
     val generos : List<String> = ArrayList<String>(),
     val fotoPerfil : String = ""
 ){

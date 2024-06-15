@@ -417,7 +417,7 @@ fun RegistroUsuarioScreen2(
             Spacer(modifier = Modifier.height(16.dp))
             CampoTexto(
                 text = numeroTelefono.toString(),
-                onTextChanged = { viewModel.numeroTelefonoChange(it.trim().toInt())
+                onTextChanged = { viewModel.numeroTelefonoChange(it.trim().toLong())
                                 telefonoLengthError = it.length != 9},
                 label = "Número teléfono",
                 keyboardOptions = KeyboardOptions(

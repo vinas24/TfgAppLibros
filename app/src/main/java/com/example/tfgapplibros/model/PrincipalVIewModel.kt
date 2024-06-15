@@ -32,23 +32,23 @@ class PrincipalVIewModel: ViewModel() {
         if (loading || endOfListReached) return
 
         loading = true
-            libroRepo.librosPrincipal(excludeId,lastDocumentSnapshot,limit).observeForever { newLibros ->
-                if (newLibros.isNotEmpty()) {
-                    lastDocumentSnapshot = newLibros.last().documentSnapshot
-                    _libros.value = (_libros.value ?: emptyList()) + newLibros
+        libroRepo.librosPrincipal(excludeId,lastDocumentSnapshot,limit).observeForever { newLibros ->
+            if (newLibros.isNotEmpty()) {
+                lastDocumentSnapshot = newLibros.last().documentSnapshot
+                _libros.value = (_libros.value ?: emptyList()) + newLibros
 
-                    if (newLibros.size < limit) {
-                        endOfListReached = true
-                    }
-                } else {
+                if (newLibros.size < limit) {
                     endOfListReached = true
                 }
-                _libros.postValue(_libros.value)
-                Handler(Looper.getMainLooper()).post{
-                    loading = false
-                }
-
+            } else {
+                endOfListReached = true
             }
+            _libros.postValue(_libros.value)
+            Handler(Looper.getMainLooper()).post{
+                loading = false
+            }
+
+        }
     }
 
     private val _filtro = MutableLiveData<Int>(0)
