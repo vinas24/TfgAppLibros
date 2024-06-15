@@ -320,8 +320,7 @@ fun RegistroUsuarioScreen2(
 ) {
     val context = LocalContext.current
 
-    var listaGeneros = listOf("Ficción", "Fantasía", "Misterio", "Romance", "Histórica", "Poesía",
-        "Infantil", "Juveníl", "Autoayuda", "Terror")
+    var listaGeneros = listOf("Auto-ayuda", "Fantasía", "Ficción", "Histórica","Infantil", "Juvenil", "Misterio", "Poesía", "Romance", "Terror" )
 
     val nombre by viewModel.nombre.observeAsState("")
     val apellidos by viewModel.apellidos.observeAsState("")
@@ -334,6 +333,7 @@ fun RegistroUsuarioScreen2(
     val generos by viewModel.generos.observeAsState(emptyList())
     var expanded by remember { mutableStateOf(false) }
 
+    var demasiadosGeneros by remember { mutableStateOf(false) }
     var biografiaLengthError by remember { mutableStateOf(false) }
     var telefonoLengthError by remember { mutableStateOf(false) }
 
@@ -467,17 +467,21 @@ fun RegistroUsuarioScreen2(
                 ExposedDropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
-                    Modifier.background(getColorFromResource(colorResId = R.color.background_dark))
+                    Modifier.background(getColorFromResource(colorResId = R.color.background_light))
                 ) {
                     listaGeneros.forEach { selec ->
                         DropdownMenuItem(
                             text = { Text(text = selec, color = Color.Black) },
                             onClick = {
                                 if (selec !in generos) {
-                                    val generosFavoritos = generos + selec
-                                    viewModel.generosChange(
-                                        generosFavoritos
-                                    )
+                                    if (generos.size < 3) {
+                                        val generosFavoritos = generos + selec
+                                        viewModel.generosChange(
+                                            generosFavoritos
+                                        )
+                                    } else {
+                                        demasiadosGeneros = true
+                                    }
                                 } else {
                                     val generosFavoritos = generos - selec
                                     viewModel.generosChange(
@@ -489,6 +493,10 @@ fun RegistroUsuarioScreen2(
                         )
                     }
                 }
+            }
+            if (demasiadosGeneros) {
+                Toast.makeText(LocalContext.current,"Máximo 3 géneros favoritos",Toast.LENGTH_SHORT).show()
+                demasiadosGeneros = false
             }
             Spacer(modifier = Modifier.height(16.dp))
             CampoTextoLargo(

@@ -125,7 +125,7 @@ fun TopBarPrincipal(
                 DropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
-                    Modifier.background(getColorFromResource(colorResId = R.color.background))
+                    Modifier.background(getColorFromResource(colorResId = R.color.background_light))
                 ) {
                     DropdownMenuItem(
                         text = { Text("Mi Perfil", color = Color.Black) },
