@@ -1,15 +1,24 @@
 package com.example.tfgapplibros.components
 
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Mail
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.tfgapplibros.R
 import com.example.tfgapplibros.data.Libro
+import com.example.tfgapplibros.data.Usuario
 
 
 //TODO: Cambiar el modelo de la imagen al repositorio
@@ -106,5 +116,50 @@ fun CajaGenero(
         }
     }
 }
+
+@Composable
+fun CajaUsuario(
+    user: Usuario,
+    onclick: (String) -> Unit
+) {
+    Card (
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White)
+    ) {
+        Row (
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            AsyncImage(
+                model = user.fotoPerfil,
+                contentDescription = "Foto de perfil",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(40.dp)
+                    .aspectRatio(1f, matchHeightConstraintsFirst = true)
+                    .border(
+                        width = 1.dp,
+                        color = Color.LightGray,
+                        shape = CircleShape
+                    )
+                    .padding(2.dp)
+                    .clip(CircleShape)
+            )
+            Text(text = user.nombreUsuario, color = Color.DarkGray)
+            IconButton(onClick = { onclick(user.correo) }) {
+                Icon(
+                    imageVector = Icons.Default.Mail,
+                    tint = getColorFromResource(colorResId = R.color.primary_muted),
+                    contentDescription = "" )
+            }
+
+
+        }
+
+    }
+}
+
 
 

@@ -1,5 +1,8 @@
 package com.example.tfgapplibros.components
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -114,3 +117,13 @@ fun getColorFromResource(colorResId: Int): Color {
     return Color(ContextCompat.getColor(context, colorResId))
 }
 
+
+
+fun openEmailDialog(email: String, context: Context) {
+    val intent = Intent(Intent.ACTION_SENDTO).apply {
+        data = Uri.parse("mailto:")
+        putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+        putExtra(Intent.EXTRA_SUBJECT, "Bookself: Intercambio de libro")
+    }
+    context.startActivity(intent)
+}

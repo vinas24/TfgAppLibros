@@ -10,15 +10,19 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
@@ -26,13 +30,19 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -53,24 +63,32 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.tfgapplibros.AddLibroScreen
 import com.example.tfgapplibros.LibroScreen
+import com.example.tfgapplibros.LoginScreen
+import com.example.tfgapplibros.PerfilScreen
 import com.example.tfgapplibros.PrincipalScreen
 import com.example.tfgapplibros.R
 import com.example.tfgapplibros.components.CajaGenero
+import com.example.tfgapplibros.components.CajaUsuario
 import com.example.tfgapplibros.components.CartaLibroPerfil
 import com.example.tfgapplibros.components.acortarTxt
 import com.example.tfgapplibros.components.getColorFromResource
+import com.example.tfgapplibros.components.openEmailDialog
 import com.example.tfgapplibros.data.Libro
 import com.example.tfgapplibros.data.Usuario
 import com.example.tfgapplibros.model.Autentificacion
 import com.example.tfgapplibros.model.PerfilViewModel
+import kotlin.math.exp
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,10 +98,14 @@ fun Perfil(
     userId: String
 ) {
     val esMio = Autentificacion.usuarioActualUid == userId
+    val viewModel: PerfilViewModel = viewModel()
+    val interesados by viewModel.interesados.collectAsState()
+    LaunchedEffect(userId) {
+        viewModel.obtenerInteresados(userId)
+    }
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                //TODO: cambiar el titulo dependiendo si es o no es el perfil de nuestro usuario
                 title = {
                     if(esMio) {
                         Text("Mi Perfil")
@@ -106,7 +128,29 @@ fun Perfil(
                             tint = Color.White
                         )
                     }
-                })
+                },
+                actions = {
+                        var expanded by remember { mutableStateOf(false) }
+                        IconButton(
+                            onClick = { expanded = !expanded },
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.AutoAwesome,
+                                contentDescription = "Interesados",
+                                tint = Color.White
+                            )
+                        }
+                        val context = LocalContext.current
+                        Interesados(
+                            expanded = expanded,
+                            onDismiss = {expanded = false},
+                            interesados = interesados,
+                            onClick = {
+                                openEmailDialog(email = it, context = context )
+                            }
+                        )
+                }
+            )
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -127,7 +171,32 @@ fun Perfil(
             }
         }
     ) {
-        Contenido(it = it, navController = navController, userId = userId, esMio = esMio);
+        Contenido(it = it, navController = navController, userId = userId, esMio = esMio, viewModel = viewModel);
+    }
+}
+
+@Composable
+fun Interesados(expanded: Boolean, onDismiss:() -> Unit, interesados: List<Usuario>, onClick: (String) -> Unit) {
+    if(expanded) {
+        Popup (
+            alignment = Alignment.TopEnd,
+            onDismissRequest = onDismiss
+        ) {
+            ElevatedCard(
+                modifier = Modifier
+                    .fillMaxWidth(0.6f)
+                    .padding(horizontal = 16.dp)
+                    .heightIn(max = 200.dp)
+            ) {
+                LazyColumn (Modifier.fillMaxWidth()){
+                    items(interesados) { user ->
+                        CajaUsuario(user = user) {
+                            onClick(it)
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -136,9 +205,10 @@ fun Contenido(
     it: PaddingValues,
     navController: NavHostController,
     userId: String,
-    esMio: Boolean
+    esMio: Boolean,
+    viewModel: PerfilViewModel
 ) {
-    val viewModel: PerfilViewModel = viewModel()
+
     val libros by viewModel.libros.collectAsState()
     val favoritos by viewModel.favoritos.collectAsState()
     val datosUser by viewModel.datosUser.collectAsState()
@@ -148,6 +218,7 @@ fun Contenido(
         viewModel.obtenerLibros(userId = userId)
         viewModel.cargarPerfil(userId)
         viewModel.obtenerFavoritos(userId = userId)
+        viewModel.obtenerInteresados(userId = userId)
     }
     Column(
         modifier = Modifier
@@ -380,24 +451,4 @@ fun Favoritos(favoritos:List<Libro>,navController: NavHostController) {
     }
 }
 
-//TODO: Mover la imagen a Images.kt
-@Composable
-fun ImagenRedonda(
-    image: Painter,
-    modifier: Modifier = Modifier
-) {
-    Image(
-        painter = image,
-        contentDescription = null,
-        modifier = modifier
-            .aspectRatio(1f, matchHeightConstraintsFirst = true)
-            .border(
-                width = 1.dp,
-                color = Color.LightGray,
-                shape = CircleShape
-            )
-            .padding(2.dp)
-            .clip(CircleShape)
-    )
-}
 

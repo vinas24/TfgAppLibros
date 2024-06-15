@@ -28,6 +28,9 @@ class PerfilViewModel() : ViewModel(){
     private val _favoritos = MutableStateFlow<List<Libro>>(emptyList())
     val favoritos: StateFlow<List<Libro>> = _favoritos
 
+    private val _interesados = MutableStateFlow<List<Usuario>>(emptyList())
+    val interesados: StateFlow<List<Usuario>> = _interesados
+
     private val _datosUser = MutableStateFlow<Usuario?>(null)
 
     val datosUser: StateFlow<Usuario?> = _datosUser
@@ -90,7 +93,6 @@ class PerfilViewModel() : ViewModel(){
                 .collection("libros")
                 .get()
                 .await()
-            Log.d("libroespec",snapshot.documents.size.toString())
 
             for (doc in snapshot.documents) {
                 val libro = doc.toObject(Libro::class.java)
@@ -104,4 +106,38 @@ class PerfilViewModel() : ViewModel(){
         return libros
     }
 
+    fun obtenerInteresados(userId: String) {
+        val db = FirebaseFirestore.getInstance()
+        val inters = mutableListOf<Usuario>()
+        try {
+            db
+                .collection("usuarios")
+                .document(userId)
+                .collection("interesados")
+                .get()
+                .addOnSuccessListener {
+                    for (doc in it.documents) {
+                        val usuario = doc.toObject(Usuario::class.java)
+                        if (usuario != null) {
+                            db
+                                .collection("usuarios")
+                                .document(usuario.idUsuario)
+                                .collection("interesados")
+                                .document(userId)
+                                .get()
+                                .addOnSuccessListener {
+                                    if (it.exists()) {
+                                        inters.add(usuario)
+                                        _interesados.value = inters
+                                    }
+                                }
+                        }
+                    }
+                }
+                .addOnFailureListener {
+                }
+        } catch (e: Exception) {
+               e.printStackTrace()
+        }
+    }
 }
