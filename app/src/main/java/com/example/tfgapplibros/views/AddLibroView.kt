@@ -124,7 +124,7 @@ fun AddLibroContenido(
     esEditando: Boolean,
     libroId: String?
 ) {
-    var listaGeneros = listOf("Ficción", "Fantasía", "Misterio", "Romance", "Histórica", "Poesía", "Infantil", "Juveníl", "Autoayuda", "Terror" )
+    var listaGeneros = listOf("Ficción", "Fantasía", "Misterio", "Romance", "Histórica", "Poesía", "Infantil", "Juveníl", "Auto-ayuda", "Terror" )
 
     val titulo by viewModel.titulo.observeAsState("")
     val autor by viewModel.autor.observeAsState("")
@@ -145,7 +145,6 @@ fun AddLibroContenido(
         titulo.isNotEmpty() && autor.isNotEmpty() && generoSeleccionado.isNotEmpty() && imageUriSelec != null
 
 
-    //TODO: Porq esta no va pero la del login si??
     if (viewModel.loading) {
         Box(
             modifier = Modifier
@@ -156,7 +155,6 @@ fun AddLibroContenido(
             CircularProgressIndicator(color = getColorFromResource(colorResId = R.color.primary))
         }
     }
-
 
     Surface(
         color = getColorFromResource(colorResId = R.color.background_light),
@@ -205,7 +203,7 @@ fun AddLibroContenido(
                     readOnly = true,
                     value = generoSeleccionado,
                     onValueChange = { viewModel.generoChange(it) },
-                    label = { Text("Genero") },
+                    label = { Text("Género") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     colors = ExposedDropdownMenuDefaults.textFieldColors(
                         focusedLabelColor = colorPrim2,

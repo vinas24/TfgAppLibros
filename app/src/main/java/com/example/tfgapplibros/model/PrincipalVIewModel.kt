@@ -53,4 +53,11 @@ class PrincipalVIewModel: ViewModel() {
             }
     }
 
+    private val _filtro = MutableLiveData<Int>(0)
+    val filtro: LiveData<Int> = _filtro
+
+    fun changeFiltro(newFiltro: Int) {
+        _filtro.value = newFiltro
+    }
+
 }

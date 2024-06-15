@@ -60,23 +60,33 @@ class LibroRepository {
         libroId: String,
         libro: Libro,
         imgUri: Uri,
+        delImage: Boolean,
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
-        val imgRef = storage.reference.child("libros/$libroId.jpg")
-        imgRef.delete()
-            .addOnSuccessListener {
-                //Hay un problema cuando la URI es la misma
-                //ª q bn
-                imgRef.putFile(imgUri)
-                    .addOnSuccessListener {
-                        imgRef.downloadUrl.addOnSuccessListener {
-                            val libroActualizado =
-                                libro.copy(imgUrl = it.toString(), libroId = libroId)
-                            guardarLibroDb(userId, libroId, libroActualizado, onSuccess, onFailure)
+        if (delImage) {
+            val imgRef = storage.reference.child("libros/$libroId.jpg")
+            imgRef.delete()
+                .addOnSuccessListener {
+                    imgRef.putFile(imgUri)
+                        .addOnSuccessListener {
+                            imgRef.downloadUrl.addOnSuccessListener {
+                                val libroActualizado =
+                                    libro.copy(imgUrl = it.toString(), libroId = libroId)
+                                guardarLibroDb(
+                                    userId,
+                                    libroId,
+                                    libroActualizado,
+                                    onSuccess,
+                                    onFailure
+                                )
+                            }.addOnFailureListener { onFailure(it) }
                         }.addOnFailureListener { onFailure(it) }
-                    }.addOnFailureListener { onFailure(it) }
-            }.addOnFailureListener { onFailure(it) }
+                }.addOnFailureListener { onFailure(it) }
+        } else {
+            val libroActualizado = libro.copy(imgUrl = imgUri.toString(), libroId = libroId)
+             guardarLibroDb(userId,libroId,libroActualizado,onSuccess,onFailure)
+        }
 
 
     }

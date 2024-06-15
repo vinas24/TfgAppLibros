@@ -43,6 +43,8 @@ class AddLibroViewModel : ViewModel() {
     private val _loading = mutableStateOf(false)
     val loading get() = _loading.value
 
+    private val _imgChanged = mutableStateOf(false)
+
     fun tituloChange(newTit: String) {
         _titulo.value = newTit
     }
@@ -65,6 +67,7 @@ class AddLibroViewModel : ViewModel() {
 
     fun newImagenSelec(newUri: Uri) {
         _imgUri.value = newUri
+        _imgChanged.value = true
         Log.d("helelrere",_imgUri.value.toString())
 
     }
@@ -91,7 +94,7 @@ class AddLibroViewModel : ViewModel() {
             estado = estado,
             descripcion = desc
         )
-        libroRepo.actualizarLibro(userId, libroId, libro, img,
+        libroRepo.actualizarLibro(userId, libroId, libro, img, _imgChanged.value,
             onSuccess = {
                 _mensOk.value = "Libro actualizado"
                 perfil()
