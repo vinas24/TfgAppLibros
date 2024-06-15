@@ -165,7 +165,7 @@ fun RegistroUsuarioScreen1(
         onResult = { uri -> uri?.let { viewModel.fotoPerfilChange(uri) } }
     )
     val camposRellenosCorrectamente =
-        nombreUsuario.isNotEmpty() && contrasena.isNotEmpty() && correo.isNotBlank()
+        fotoPerfil != null && nombreUsuario.isNotEmpty() && contrasena.isNotEmpty() && correo.isNotBlank()
         && contrasena.length >= 6 && contrasena.equals(confirmPassword)
 
     val commonModifier =
@@ -437,7 +437,7 @@ fun RegistroUsuarioScreen2(
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = { expanded = it },
-                modifier = Modifier.padding(horizontal = 25.dp)
+                modifier = Modifier.padding(horizontal = 35.dp)
             ) {
                 val colorPrim = getColorFromResource(colorResId = R.color.primary)
                 val colorPrim2 = getColorFromResource(colorResId = R.color.primary_dark)
@@ -517,7 +517,13 @@ fun RegistroUsuarioScreen2(
                     enabled = true,
                     onClick = onBackClick
                 )
-                Spacer(modifier = Modifier.width(16.dp))
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
                 BotonRegister(
                     texto = "Crear Usuario",
                     enabled = camposRellenos

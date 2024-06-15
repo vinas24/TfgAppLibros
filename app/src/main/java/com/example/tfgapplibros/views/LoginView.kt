@@ -61,7 +61,7 @@ fun Login(
 
     var usuario by remember { mutableStateOf("") }
     var passwd by remember { mutableStateOf("") }
-    val camposNoVacios = usuario.isNotEmpty() && passwd.isNotEmpty()
+    val camposNoVacios = usuario.isNotEmpty() && passwd.isNotEmpty() && passwd.length >= 6
     //For error showcasing
     val context = LocalContext.current
 
