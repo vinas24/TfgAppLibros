@@ -182,8 +182,6 @@ fun TopBarPrincipal(
             selected = filtro == 2,
             onClick = { viewModel.changeFiltro(2)},
             label = { Text(text = "Género" ) })
-
-
     }
 
 }

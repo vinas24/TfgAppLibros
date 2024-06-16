@@ -223,7 +223,7 @@ fun AddLibroContenido(
                 ExposedDropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
-                    Modifier.background(getColorFromResource(colorResId = R.color.background_dark))
+                    Modifier.background(getColorFromResource(colorResId = R.color.background_light))
                 ) {
                     listaGeneros.forEach { selec ->
                         DropdownMenuItem(
