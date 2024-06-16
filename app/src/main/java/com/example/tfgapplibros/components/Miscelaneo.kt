@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.example.tfgapplibros.R
+import java.text.Normalizer
 import kotlin.math.abs
 
 @Composable
@@ -127,3 +128,6 @@ fun openEmailDialog(email: String, context: Context) {
     }
     context.startActivity(intent)
 }
+
+fun String.removeAccents() =
+    Normalizer.normalize(this, Normalizer.Form.NFD)

@@ -56,6 +56,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.example.tfgapplibros.LibroScreen
 import com.example.tfgapplibros.components.CartaLibroPerfil
 import com.example.tfgapplibros.components.MySearchBar
+import com.example.tfgapplibros.components.removeAccents
 import com.example.tfgapplibros.data.LibroPaginacion
 import com.example.tfgapplibros.model.PrincipalVIewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -221,7 +222,7 @@ fun PaginaPrincipal(
             val libro = libroPag.libro
             when (viewModel.filtro.value) {
                 0 -> {
-                    if(libro.titulo.lowercase().contains(search.lowercase())) {
+                    if(libro.titulo.lowercase().removeAccents().contains(search.lowercase().removeAccents())) {
                         CartaLibroPerfil(libro = libro) {
                             navController.navigate(
                                 LibroScreen(
@@ -234,7 +235,7 @@ fun PaginaPrincipal(
                     }
                 }
                 1 ->  {
-                    if(libro.autor.lowercase().contains(search.lowercase())) {
+                    if(libro.autor.lowercase().removeAccents().contains(search.lowercase().removeAccents())) {
                         CartaLibroPerfil(libro = libro) {
                             navController.navigate(
                                 LibroScreen(
@@ -247,7 +248,7 @@ fun PaginaPrincipal(
                     }
                 }
                 2 -> {
-                    if(libro.genero.lowercase().contains(search.lowercase())) {
+                    if(libro.genero.lowercase().removeAccents().contains(search.lowercase().removeAccents())) {
                         CartaLibroPerfil(libro = libro) {
                             navController.navigate(
                                 LibroScreen(
