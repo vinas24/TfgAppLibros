@@ -220,9 +220,11 @@ fun PaginaPrincipal(
     ) {
         items(libros) { libroPag ->
             val libro = libroPag.libro
+            Log.d("Pruebasssss", search.lowercase().removeAccents())
             when (viewModel.filtro.value) {
                 0 -> {
                     if(libro.titulo.lowercase().removeAccents().contains(search.lowercase().removeAccents())) {
+
                         CartaLibroPerfil(libro = libro) {
                             navController.navigate(
                                 LibroScreen(

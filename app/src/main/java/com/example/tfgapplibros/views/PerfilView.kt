@@ -30,7 +30,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AllInbox
 import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Inbox
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
@@ -135,7 +137,7 @@ fun Perfil(
                             onClick = { expanded = !expanded },
                         ) {
                             Icon(
-                                imageVector = Icons.Default.AutoAwesome,
+                                imageVector = Icons.Default.Inbox,
                                 contentDescription = "Interesados",
                                 tint = Color.White
                             )
@@ -193,6 +195,17 @@ fun Interesados(expanded: Boolean, onDismiss:() -> Unit, interesados: List<Usuar
                         CajaUsuario(user = user) {
                             onClick(it)
                         }
+                    }
+                    item {
+                        if (interesados.isEmpty()) {
+                            Row (
+                                horizontalArrangement = Arrangement.Center,
+                                modifier = Modifier.fillMaxWidth().background(getColorFromResource(
+                                    colorResId = R.color.background_light))
+                            ) {
+                                Text( modifier = Modifier.padding(horizontal = 10.dp), text = "No hay usuarios con quienes intercambiar", color = Color.Black)
+                            }
+                    }
                     }
                 }
             }

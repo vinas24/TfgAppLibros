@@ -131,3 +131,4 @@ fun openEmailDialog(email: String, context: Context) {
 
 fun String.removeAccents() =
     Normalizer.normalize(this, Normalizer.Form.NFD)
+        .replace("\\p{Mn}+".toRegex(), "")
