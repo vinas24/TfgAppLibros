@@ -40,8 +40,11 @@ class PrincipalVIewModel: ViewModel() {
                 if (newLibros.size < limit) {
                     endOfListReached = true
                 }
-            } else {
-                endOfListReached = true
+                else {
+                    endOfListReached = true
+                }
+            }else {
+                _libros.value = emptyList()
             }
             _libros.postValue(_libros.value)
             Handler(Looper.getMainLooper()).post{

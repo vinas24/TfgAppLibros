@@ -202,7 +202,7 @@ fun ContenidoLibro(
                     Text(
                         modifier = Modifier
                             .padding(vertical = 8.dp),
-                        text = libro.titulo.acortarTxt(20),
+                        text = libro.titulo.acortarTxt(14),
                         color = Color.Black,
                         style = MaterialTheme.typography.headlineLarge
                     )

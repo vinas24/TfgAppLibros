@@ -107,10 +107,12 @@ fun String.toColor(): Color {
 }
 
 fun String.acortarTxt( chars: Int): String {
-    return if (this.length <= chars){
+    return if (this.length <= chars + 6){
         this
-    } else
-        "${this.take(chars)}..."
+    }
+    else {
+        "${this.take(chars)}…"
+    }
 }
 @Composable
 fun getColorFromResource(colorResId: Int): Color {
