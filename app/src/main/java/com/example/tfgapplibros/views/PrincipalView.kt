@@ -205,7 +205,7 @@ fun PaginaPrincipal(
             }
             .distinctUntilChanged()
             .collect { esFin ->
-                if (esFin && !viewModel.loading && !viewModel.endOfListReached) {
+                if (esFin || !viewModel.loading || !viewModel.endOfListReached) {
                     viewModel.recogerLibros(userId ?: "")
                 }
             }
