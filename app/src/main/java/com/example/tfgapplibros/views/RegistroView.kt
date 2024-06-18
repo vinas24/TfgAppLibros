@@ -538,7 +538,6 @@ fun RegistroUsuarioScreen2(
                 )
                 {
                     viewModel.registerUser() {
-                        Toast.makeText(context, "Registro exotico", Toast.LENGTH_LONG).show()
                         navController.navigate(
                             PrincipalScreen
                         )
